@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useMemo, useState, useRef } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment, useProgress, Html } from '@react-three/drei';
+import { OrbitControls, useProgress, Html } from '@react-three/drei';
 import * as THREE from 'three'; 
 import ComputerModel from './ComputerModel';
 import Yassine from './Yassine';
@@ -319,11 +319,13 @@ function Home(){
             setIsReturning={setIsReturning}
         />
         
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[100, 200, 100]} intensity={3} castShadow shadow-mapSize={[2048, 2048]}>
+        <ambientLight intensity={0.9} />
+        <hemisphereLight skyColor="#ffffff" groundColor="#6f6f6f" intensity={0.9} />
+        <directionalLight position={[100, 200, 100]} intensity={2.8} castShadow shadow-mapSize={[2048, 2048]}>
           <orthographicCamera attach="shadow-camera" args={[-200, 200, 200, -200]} />
         </directionalLight>
-        <spotLight position={[0, 50, 300]} intensity={5} />
+        <spotLight position={[0, 80, 300]} intensity={3.2} angle={0.4} penumbra={0.5} />
+        <pointLight position={[-120, 120, 220]} intensity={1.5} />
 
         <Suspense fallback={null}>
           <ModelWithShadows 
@@ -429,7 +431,6 @@ function Home(){
             TWO: THREE.TOUCH.DOLLY_PAN
           }}
         />
-        <Environment preset="city" />
       </Canvas>
     </div>
   );
