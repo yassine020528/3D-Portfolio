@@ -56,6 +56,15 @@ export default function ComputerOS({ onExit }) {
     },
     {
       id: 4,
+      title: "Hydro-Québec Weather Forecasting Platform",
+      tech: "Angular, .NET, GDAL, Leaflet, SQLite, RESTful API",
+      description: "Developed a full-stack weather visualization platform for real-time multi-model forecast. Implemented GDAL raster processing and Leaflet for interactive geospatial mapping, supported by a RESTful API and SQLite database.",
+      image: "/images/project4.png", 
+      logos: ["/logos/angular.svg","/logos/dotnet.svg", "/logos/gdal.svg", "/logos/leaflet.svg", "/logos/sqlite.svg", "/logos/restful-api.svg"],
+      caption: <>It's so cold,<br/>even the code froze.</>
+    },
+    {
+      id: 5,
       title: "PolyHacks 2025 - WildGuard",
       tech: "YOLOv8, OpenCV, Python, Flask, PyTorch, Ultralytics",
       description: "Led the development of WildGuard, an AI-powered wildlife monitoring system that detects and classifies animals in real-time using YOLOv8. Engineered data pipelines and a Flask web interface for live video streaming and alerts.",
@@ -64,7 +73,7 @@ export default function ComputerOS({ onExit }) {
       caption: <>Look Mom!<br/>It's a cat!</>
     },
     {
-      id: 5,
+      id: 6,
       title: "Personal Portfolio OS",
       tech: "HTML5, CSS, JS, React, ThreeJS",
       description: "Created a 3D desk using ThreeJS with a web operating system using React. Implemented window management, terminal emulation, and interactive UI components to mimic classic OS behavior.",
