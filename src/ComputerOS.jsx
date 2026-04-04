@@ -30,10 +30,10 @@ export default function ComputerOS({ onExit }) {
     {
       id: 1,
       title: "Embedded Obstacle Detection",
-      tech: "C, ATmega164A, Assembly",
-      description: "Built an autonomous search system using the ATmega164A microcontroller. Implemented low-level I/O control, sensor data acquisition, and real-time decision logic in C based on strict timing specifications.",
+      tech: "C++, ATmega164A, Assembly",
+      description: "Built an autonomous search system using the ATmega164A microcontroller. Implemented low-level I/O control, sensor data acquisition, and real-time decision logic in C++ based on strict timing specifications.",
       image: "/images/project1.JPG", 
-      logos: ["/logos/c.svg", "/logos/assembly.svg"],
+      logos: ["/logos/c++.svg", "/logos/assembly.svg"],
       caption: <>Held together by <br/>1% wires, and 99% faith.</>
     },
     {
