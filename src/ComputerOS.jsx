@@ -411,8 +411,28 @@ export default function ComputerOS({ onExit }) {
             </div>
             <br />
             <div style={{ display: 'flex', gap: '10px', marginTop: 'auto' }}>
-              <a href="/yassine_abassi.pdf" target="_blank" className="theme-btn" style={{ textAlign: 'center', flex: 1, textDecoration: 'none', background: 'var(--accent-color)', color: 'var(--bg-color)', fontWeight: 'bold' }}>
-                ⬇ Install Full_CV.pdf
+              <a
+                href="/yassine_abassi.pdf"
+                target="_blank"
+                className="theme-btn"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flex: 1,
+                  textDecoration: 'none',
+                  background: 'var(--accent-color)',
+                  color: 'var(--bg-color)',
+                  fontWeight: 'bold'
+                }}
+              >
+                <span style={{ flex: 1, textAlign: 'center' }}>View Resume</span>
+                <img
+                  src="/logos/expand.png"
+                  alt=""
+                  aria-hidden="true"
+                  style={{ width: '16px', height: '16px', marginLeft: '10px', objectFit: 'contain' }}
+                />
               </a>
             </div>
           </div>
