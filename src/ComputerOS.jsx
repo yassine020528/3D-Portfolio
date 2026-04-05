@@ -22,6 +22,7 @@ export default function ComputerOS({ onExit }) {
   const termEndRef = useRef(null);
   const dragRef = useRef({ id: null, offsetX: 0, offsetY: 0 });
   const [expandedProjectId, setExpandedProjectId] = useState(null);
+  const [fullscreenFigure, setFullscreenFigure] = useState(null);
 
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const [isSending, setIsSending] = useState(false);
@@ -129,6 +130,17 @@ export default function ComputerOS({ onExit }) {
 
   useEffect(() => { termEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [termHistory]);
 
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && fullscreenFigure) {
+        closeFullscreenFigure('keyboard');
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [fullscreenFigure]);
+
   const handleShutdown = (e) => {
     if (e) e.stopPropagation(); 
     const offAudio = new Audio('/sounds/on-off-sound.mp3');
@@ -184,6 +196,19 @@ export default function ComputerOS({ onExit }) {
           console.error(error);
           alert("Transmission failed: Connection refused.");
       });
+  };
+
+  const openFullscreenFigure = (src, alt, caption) => {
+    setFullscreenFigure({ src, alt, caption });
+  };
+
+  const closeFullscreenFigure = (soundType) => {
+    if (soundType === 'keyboard') {
+      playKeystrokeSound();
+    } else if (soundType === 'click') {
+      playClickSound();
+    }
+    setFullscreenFigure(null);
   };
 
   const getThemeVars = () => {
@@ -287,6 +312,78 @@ export default function ComputerOS({ onExit }) {
         }
         .social-link { display: inline-flex; align-items: center; margin-right: 15px; text-decoration: none; color: var(--accent-color); }
         .social-link:hover { text-decoration: underline; }
+        .figure-image {
+            cursor: zoom-in;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .figure-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.28);
+        }
+        .fullscreen-figure-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 12000;
+            background: rgba(0,0,0,0.88);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .fullscreen-figure-modal {
+            position: relative;
+            max-height: 92dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            width: auto;
+            max-width: 92vw;
+        }
+        .fullscreen-figure-shell {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 92vw;
+        }
+        .fullscreen-figure-image {
+            width: auto;
+            max-width: 100%;
+            height: clamp(320px, 72vh, 720px);
+            object-fit: contain;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.14);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+            background: rgba(0,0,0,0.35);
+        }
+        .fullscreen-figure-caption {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #f5f5f5;
+            opacity: 0.9;
+        }
+        .fullscreen-figure-close {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 999px;
+            background: rgba(20,20,20,0.92);
+            color: #fff;
+            font-size: 1.4rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .fullscreen-figure-hint {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+        }
 
         @media (max-width: 768px) {
             .window:not(.maximized) {
@@ -314,6 +411,19 @@ export default function ComputerOS({ onExit }) {
             }
             .project-image-container {
                 margin-bottom: 15px;
+            }
+            .fullscreen-figure-overlay {
+                padding: 16px;
+            }
+            .fullscreen-figure-modal {
+                max-width: 100%;
+            }
+            .fullscreen-figure-close {
+                top: -4px;
+                right: 0;
+            }
+            .fullscreen-figure-image {
+                height: clamp(240px, 58vh, 520px);
             }
         }
       `}</style>
@@ -366,13 +476,25 @@ export default function ComputerOS({ onExit }) {
             <p>I've been fascinated by how things work "under the hood" ever since I dismantled my first remote control car.</p>
             <br />
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                <img src="/images/young_self.JPG" alt="Young Yassine" style={{ width: '100%', maxWidth: '250px', borderRadius: '4px', border: '2px solid var(--border-color)', filter: 'grayscale(0.8) sepia(0.2)' }} />
+                <img
+                  src="/images/young_self.JPG"
+                  alt="Young Yassine"
+                  className="figure-image"
+                  onClick={() => openFullscreenFigure('/images/young_self.JPG', 'Young Yassine', 'Figure 1: Younger me coding this website :)')}
+                  style={{ width: '100%', maxWidth: '250px', borderRadius: '4px', border: '2px solid var(--border-color)', filter: 'grayscale(0.8) sepia(0.2)' }}
+                />
                 <p style={{ fontSize: '0.8rem', fontStyle: 'italic', marginTop: '5px', opacity: 0.7 }}>Figure 1: Younger me coding this website :)</p>
             </div>
             <p>Today, this my younger self's curiosity has blossomed into a passion for computer engineering. <br /><i>"Why build a simple portfolio when you can simulate an entire operating system?"</i> - Me, at 3 AM.</p>
             <br />
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-              <img src="/images/old_self.jpg" alt="Old Yassine" style={{ width: '100%', maxWidth: '250px', borderRadius: '4px', border: '2px solid var(--border-color)', filter: 'grayscale(0.8) sepia(0.2)' }} />
+              <img
+                src="/images/old_self.jpg"
+                alt="Old Yassine"
+                className="figure-image"
+                onClick={() => openFullscreenFigure('/images/old_self.jpg', 'Old Yassine', 'Figure 2: Older me caffeinated up and ready to code more!')}
+                style={{ width: '100%', maxWidth: '250px', borderRadius: '4px', border: '2px solid var(--border-color)', filter: 'grayscale(0.8) sepia(0.2)' }}
+              />
               <p style={{ fontSize: '0.8rem', fontStyle: 'italic', marginTop: '5px', opacity: 0.7 }}>Figure 2: Older me caffeinated up and ready to code more!</p>
             </div>
             <p>Whether it's designing custom FPGA architectures, writing low-level embedded C, or building retro web operating systems like this one, I love solving complex engineering puzzles.</p>
@@ -542,7 +664,14 @@ export default function ComputerOS({ onExit }) {
                     <div className="project-detail-layout" style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
                       <div className="project-image-container" style={{ flexShrink: 0, display : 'block'}}>
                         <div style={{ width: '120px', height: '120px', margin: '0 auto', background: '#000', border: '1px solid var(--border-color)', display: 'block', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', overflow: 'hidden' }}>
-                           <img src={project.image} alt={project.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display='none'; e.target.parentNode.style.color = 'var(--text-color)'; e.target.parentNode.innerText = 'IMG_ERR'; }}/>
+                           <img
+                             src={project.image}
+                             alt={project.title}
+                             className="figure-image"
+                             onClick={() => openFullscreenFigure(project.image, project.title, `Figure ${project.id}: ${typeof project.caption === 'string' ? project.caption : project.title}`)}
+                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                             onError={(e) => { e.target.style.display='none'; e.target.parentNode.style.color = 'var(--text-color)'; e.target.parentNode.innerText = 'IMG_ERR'; }}
+                           />
                         </div>
                         <div style={{ textAlign: 'center', fontSize: '0.75rem', fontStyle: 'italic', opacity: 0.7 }}>Figure {project.id}: {project.caption}</div>
                       </div>
@@ -678,6 +807,46 @@ export default function ComputerOS({ onExit }) {
           <div className="menu-item" onClick={() => openWindow('contact')}>Contact</div>
           <hr style={{width: '100%', borderColor: 'var(--border-color)', margin: '5px 0'}}/>
           <div className="menu-item danger" onClick={handleShutdown}><strong>⏻ Shut Down</strong></div>
+        </div>
+      )}
+
+      {fullscreenFigure && (
+        <div
+          className="fullscreen-figure-overlay"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              e.stopPropagation();
+              closeFullscreenFigure('click');
+            }
+          }}
+        >
+          <div
+            className="fullscreen-figure-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="fullscreen-figure-shell">
+              <button
+                type="button"
+                className="fullscreen-figure-close"
+                aria-label="Close fullscreen figure"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeFullscreenFigure('click');
+                }}
+              >
+                ×
+              </button>
+              <img
+                src={fullscreenFigure.src}
+                alt={fullscreenFigure.alt}
+                className="fullscreen-figure-image"
+              />
+            </div>
+            {fullscreenFigure.caption && (
+              <div className="fullscreen-figure-caption">{fullscreenFigure.caption}</div>
+            )}
+            <div className="fullscreen-figure-hint">Click outside or press Esc to close</div>
+          </div>
         </div>
       )}
 
