@@ -485,7 +485,7 @@ export default function ComputerOS({ onExit }) {
                 />
                 <p style={{ fontSize: '0.8rem', fontStyle: 'italic', marginTop: '5px', opacity: 0.7 }}>Figure 1: Younger me coding this website :)</p>
             </div>
-            <p>Today, this my younger self's curiosity has blossomed into a passion for computer engineering. <br /><i>"Why build a simple portfolio when you can simulate an entire operating system?"</i> - Me, at 3 AM.</p>
+            <p>My younger self's curiosity has blossomed into a passion for computer engineering. <br /><i>"Why build a simple portfolio when you can simulate an entire operating system?"</i> - Me, at 3 AM.</p>
             <br />
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
               <img
