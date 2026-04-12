@@ -3,7 +3,7 @@
 
 Welcome to my personal workspace, digitized. This project isn't just a gallery of my work, it's a high-performance 3D environment built with React and Three.js that puts you in the driver's seat of my creative process.
 
-Click here to see live demo: [![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://yassineabassiportfolio.netlify.app)
+Click here to see live demo: [![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://yassineabassi.com)
 
 ## 🌟 The Experience
 ✔️Immersive 3D Room: A custom-designed workspace featuring realistic lighting, shadows, and smooth camera rigging.
