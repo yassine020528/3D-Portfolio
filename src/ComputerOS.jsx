@@ -12,6 +12,9 @@ export default function ComputerOS({ onExit }) {
     contact: { id: 'contact', title: 'contact.exe', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 300, y: 110 },
     terminal: { id: 'terminal', title: 'bash', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 250, y: 250 },
     settings: { id: 'settings', title: 'System Preferences', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 200, y: 200 },
+    mobile: { id: 'mobile', title: '~/mobile', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 330, y: 60 },
+    recycleBin: { id: 'recycleBin', title: 'Recycle', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 380, y: 160 },
+    games: { id: 'games', title: '~/games', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 240, y: 140 },
   });
 
   const [highestZ, setHighestZ] = useState(100);
@@ -26,6 +29,41 @@ export default function ComputerOS({ onExit }) {
 
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const [isSending, setIsSending] = useState(false);
+
+  const mobileList = [
+    {
+      title: 'Finance Tracker',
+      platform: 'Android',
+      appLogo: '/images/android-logo1.png',
+      techLogos: ['/logos/kotlin.svg', '/logos/jetpack-compose.svg'],
+      screenshots: ['/images/android1.png', '/images/android2.png'],
+      description: 'A personal finance tracker built with Kotlin and Jetpack Compose around a clean MVVM flow. It focuses on fast expense logging, local Room persistence, and adaptive Material 3 layouts so the dashboard stays readable whether the user is checking balances quickly or digging into spending habits.'
+    },
+    {
+      title: 'Bluetooth Tracker',
+      platform: 'Android',
+      appLogo: '/images/android-logo2.png',
+      techLogos: ['/logos/kotlin.svg', '/logos/jetpack-compose.svg'],
+      screenshots: ['/images/android3.png', '/images/android4.png'],
+      description: 'An Android app for tracking nearby Bluetooth devices and visualizing their movement with GPS trajectories. I combined asynchronous device scanning, Coroutines-based state updates, and a map-driven UI to make live location history easier to follow in real time.'
+    },
+    {
+      title: 'Running Tracker',
+      platform: 'Android',
+      appLogo: '/images/android-logo3.png',
+      techLogos: ['/logos/kotlin.svg', '/logos/jetpack-compose.svg'],
+      screenshots: ['/images/android5.jpg', '/images/android6.jpg'],
+      description: 'A location-aware running and walking app designed around session flow, route awareness, and lightweight networking. It uses Retrofit and OkHttp for connected features, Compose Navigation for a smooth in-app structure, and a mobile-first UI that keeps the important stats front and center while moving.'
+    },
+    {
+      title: 'School Tracker',
+      platform: 'iOS',
+      appLogo: '/images/ios-logo1.png',
+      techLogos: ['/logos/swift.svg'],
+      screenshots: ['/images/ios1.PNG', '/images/ios2.PNG'],
+      description: 'An iOS school tracker built in SwiftUI to organize classes, deadlines, and weighted grade calculations in one place. The app uses on-device persistence with UserDefaults and Codable JSON encoding, and it centers the experience around planning coursework visually instead of letting assignments pile up invisibly.'
+    }
+  ];
 
   const projectsList = [
     {
@@ -43,7 +81,7 @@ export default function ComputerOS({ onExit }) {
       tech: "Angular, NestJS, WebSockets",
       description: "Developed a real-time multiplayer game featuring seamless bidirectional communication. Designed event synchronization and matchmaking logic to ensure smooth gameplay under concurrent loads.",
       image: "/images/project2.png", 
-      logos: ["/logos/html.svg","/logos/css.svg", "/logos/javascript.svg","/logos/angular.svg", "/logos/nestjs.svg", "/logos/websocket.svg"],
+      logos: ["/logos/html.svg","/logos/css.svg", "/logos/typescript.svg","/logos/angular.svg", "/logos/nestjs.svg", "/logos/websocket.svg"],
       caption: <>Bug-free*<br/>(*allegedly).</>
     },
     {
@@ -165,10 +203,13 @@ export default function ComputerOS({ onExit }) {
       const cmd = termInput.trim().toLowerCase(); 
       let response = ""; 
       switch(cmd) { 
-        case 'help': response = "Available: help, about, projects, contact, clear, exit"; break; 
+        case 'help': response = "Available: help, about, projects, contact, games, mobile, recycle, clear, exit"; break; 
         case 'about': openWindow('about'); response = "Opening user_profile.txt..."; break; 
         case 'projects': openWindow('projects'); response = "Opening ~/projects..."; break; 
         case 'contact': openWindow('contact'); response = "Launching contact.exe..."; break; 
+        case 'mobile': openWindow('mobile'); response = "Opening ~/mobile..."; break;
+        case 'games': openWindow('games'); response = "Opening ~/games..."; break;
+        case 'recycle': openWindow('recycleBin'); response = "Opening Recycle..."; break;
         case 'whoami': response = "guest@portfolio_os"; break; 
         case 'exit': handleShutdown(e); return; 
         case 'clear': setTermHistory([]); setTermInput(""); return; 
@@ -249,18 +290,26 @@ export default function ComputerOS({ onExit }) {
         .os-container { background-color: var(--bg-color); color: var(--text-color); user-select: none; }
         
         .desktop { 
+            position: relative;
+            --desktop-pad: 20px;
+            --desktop-step: 108px;
             padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            flex-wrap: wrap; 
-            align-content: flex-start;
-            gap: 20px; 
             height: calc(100dvh - 60px); 
         }
 
-        .icon { width: 80px; text-align: center; padding: 10px; border-radius: 5px; transition: 0.2s; }
+        .icon { width: 88px; text-align: center; padding: 10px; border-radius: 5px; transition: 0.2s; display: flex; flex-direction: column; align-items: center; position: absolute; }
         .icon:hover { background: rgba(255,255,255,0.1); }
         .icon-img { width: 40px; height: 40px; background: var(--accent-color); border-radius: 8px; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--bg-color); }
+        .icon-img-games { padding-bottom: 3px; }
+        .icon-label { display: block; width: 100%; line-height: 1.2; text-align: center; word-break: break-word; }
+        .icon-about { top: var(--desktop-pad); left: var(--desktop-pad); }
+        .icon-projects { top: calc(var(--desktop-pad) + var(--desktop-step)); left: var(--desktop-pad); }
+        .icon-contact { top: calc(var(--desktop-pad) + (var(--desktop-step) * 2)); left: var(--desktop-pad); }
+        .icon-terminal { top: calc(var(--desktop-pad) + (var(--desktop-step) * 3)); left: var(--desktop-pad); }
+        .icon-games { position: absolute; top: var(--desktop-pad); left: calc(var(--desktop-pad) + var(--desktop-step)); }
+        .icon-mobile { position: absolute; top: calc(var(--desktop-pad) + var(--desktop-step)); left: calc(var(--desktop-pad) + var(--desktop-step)); }
+        .icon-recycle-bin { position: absolute; top: var(--desktop-pad); right: var(--desktop-pad); }
+        .icon-settings { position: absolute; left: var(--desktop-pad); bottom: var(--desktop-pad); }
         
         .window { 
             position: absolute; 
@@ -429,26 +478,38 @@ export default function ComputerOS({ onExit }) {
       `}</style>
 
       <div className="desktop">
-        <div className="icon" onClick={() => openWindow('about')}>
+        <div className="icon icon-about" onClick={() => openWindow('about')}>
           <div className="icon-img">👤</div>
-          <span>About</span>
+          <span className="icon-label">About</span>
         </div>
-        <div className="icon" onClick={() => openWindow('projects')}>
+        <div className="icon icon-projects" onClick={() => openWindow('projects')}>
           <div className="icon-img">📂</div>
-          <span>Projects</span>
+          <span className="icon-label">Projects</span>
         </div>
 
-        <div className="icon" onClick={() => openWindow('contact')}>
+        <div className="icon icon-contact" onClick={() => openWindow('contact')}>
           <div className="icon-img" style={{background: '#ff9800', color: '#ffffff'}}>✉️</div>
-          <span>Contact</span>
+          <span className="icon-label">Contact</span>
         </div>
-        <div className="icon" onClick={() => openWindow('terminal')}>
+        <div className="icon icon-terminal" onClick={() => openWindow('terminal')}>
           <div className="icon-img" style={{background: '#333', color: '#0f0'}}>&gt;_</div>
-          <span>Terminal</span>
+          <span className="icon-label">Terminal</span>
         </div>
-        <div className="icon" onClick={() => openWindow('settings')}>
+        <div className="icon icon-games" onClick={() => openWindow('games')}>
+          <div className="icon-img icon-img-games">🎮</div>
+          <span className="icon-label">Games</span>
+        </div>
+        <div className="icon icon-settings" onClick={() => openWindow('settings')}>
           <div className="icon-img" style={{background: '#ccc', color: '#333'}}>⚙️</div>
-          <span>Settings</span>
+          <span className="icon-label">Settings</span>
+        </div>
+        <div className="icon icon-mobile" onClick={() => openWindow('mobile')}>
+          <div className="icon-img">📱</div>
+          <span className="icon-label">Mobile</span>
+        </div>
+        <div className="icon icon-recycle-bin" onClick={() => openWindow('recycleBin')}>
+          <div className="icon-img" style={{background: '#8ecae6', color: '#10354a'}}>♻</div>
+          <span className="icon-label">Recycle</span>
         </div>
       </div>
 
@@ -473,7 +534,13 @@ export default function ComputerOS({ onExit }) {
             <h2 style={{color: 'var(--accent-color)', marginTop: 0}}>Hello, I'm Yassine</h2>
             <p><strong>Comp. Eng. Student</strong>, at Polytechnique Montréal</p>
             <hr style={{borderColor: 'var(--border-color)'}}/>
-            <p>I've been fascinated by how things work "under the hood" ever since I dismantled my first remote control car.</p>
+            <p>
+              I've been fascinated by how things work "under the hood" ever since I dismantled my first remote control car as a child.
+              Back then, adults would called it "destruction", but I prefer the term curiosity. 
+              <br />
+              There was something addictive about seeing the raw circuit boards and gears that made the magic happen. 
+              Eventually, I learned that putting things back together was just as fun as taking them apart.
+            </p>
             <br />
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <img
@@ -485,7 +552,12 @@ export default function ComputerOS({ onExit }) {
                 />
                 <p style={{ fontSize: '0.8rem', fontStyle: 'italic', marginTop: '5px', opacity: 0.7 }}>Figure 1: Younger me coding this website :)</p>
             </div>
-            <p>My younger self's curiosity has blossomed into a passion for computer engineering. <br /><i>"Why build a simple portfolio when you can simulate an entire operating system?"</i> - Me, at 3 AM.</p>
+            <p>My younger self's curiosity has blossomed into a full-blown passion for computer engineering, 
+              and a slightly concerning relationship with caffeine.
+              <br />
+              <i>"Why build a simple portfolio when you can simulate an entire operating system?"</i>
+               - Me, at 3 AM.
+              </p>
             <br />
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
               <img
@@ -721,6 +793,290 @@ export default function ComputerOS({ onExit }) {
         </div>
       )}
 
+      {windows.mobile.isOpen && !windows.mobile.isMinimized && (
+        <div className={`window ${windows.mobile.isMaximized ? 'maximized' : ''}`} 
+          style={{ 
+            top: windows.mobile.isMaximized ? 0 : windows.mobile.y, 
+            left: windows.mobile.isMaximized ? 0 : windows.mobile.x, 
+            width: windows.mobile.isMaximized ? '100vw' : '860px',
+            height: windows.mobile.isMaximized ? 'calc(100dvh - 45px)' : '560px',
+            zIndex: windows.mobile.zIndex, 
+            borderRadius: windows.mobile.isMaximized ? '0' : '8px'
+          }} onMouseDown={() => focusWindow('mobile')}>
+          <div className="window-header" onMouseDown={(e) => !windows.mobile.isMaximized && startDrag(e, 'mobile')}>
+            <div className="window-title">~/mobile</div>
+            <div className="window-controls">
+              <span className="min-btn" onClick={() => minimizeWindow('mobile')} style={{ background: '#febc2e'}}></span>
+              <span className="max-btn" onClick={() => maximizeWindow('mobile')} style={{ background: '#28c840'}}></span>
+              <span className="close-btn" onClick={() => closeWindow('mobile')}></span>
+            </div>
+          </div>
+          <div className="window-content">
+            <h3 style={{ marginTop: 0, color: 'var(--accent-color)' }}>Mobile builds and experiments</h3>
+            <p style={{ lineHeight: '1.6', marginBottom: '18px' }}>
+              This directory is a collection of mobile apps and experiments, with a mix of Android and iOS work focused on practical UI, persistence, mapping, and day-to-day usability.
+            </p>
+            <div style={{ display: 'grid', gap: '12px' }}>
+              {mobileList.map((quest, index) => (
+                <div
+                  key={quest.title}
+                  style={{
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '6px',
+                    padding: '14px',
+                    background: 'rgba(255,255,255,0.04)'
+                  }}
+                >
+                  <div style={{ display: 'flex', gap: '18px', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'nowrap' }}>
+                    <div
+                      style={{
+                        width: '72px',
+                        height: '72px',
+                        borderRadius: '18px',
+                        background: '#ffffff',
+                        border: '1px solid rgba(0,0,0,0.08)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <img
+                        src={quest.appLogo}
+                        alt={`${quest.title} logo`}
+                        style={{ width: '64px', height: '64px', objectFit: 'contain' }}
+                      />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                          <div style={{ color: 'var(--accent-color)', fontWeight: 'bold', fontSize: '1rem' }}>
+                            {quest.title}
+                          </div>
+                          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                            {quest.techLogos.map((logo, logoIndex) => (
+                              <img
+                                key={`${quest.title}-logo-${logoIndex}`}
+                                src={logo}
+                                alt=""
+                                aria-hidden="true"
+                                style={{ height: '24px', width: 'auto', backgroundColor: '#ffffff', padding: '2px', borderRadius: '4px' }}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            fontSize: '0.78rem',
+                            padding: '4px 8px',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '999px',
+                            opacity: 0.85
+                          }}
+                        >
+                          {quest.platform}
+                        </div>
+                      </div>
+                      <div style={{ lineHeight: '1.6', opacity: 0.92 }}>
+                        {quest.description}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px', flexShrink: 0 }}>
+                      {quest.screenshots.map((shot, shotIndex) => (
+                        <div key={`${quest.title}-shot-${shotIndex}`} style={{ width: '108px' }}>
+                          <div
+                            style={{
+                              width: '108px',
+                              height: '216px',
+                              borderRadius: '16px',
+                              overflow: 'hidden',
+                              border: '1px solid var(--border-color)',
+                              background: 'rgba(0,0,0,0.3)'
+                            }}
+                          >
+                            <img
+                              src={shot}
+                              alt={`${quest.title} screenshot ${shotIndex + 1}`}
+                              className="figure-image"
+                              onClick={() => openFullscreenFigure(shot, `${quest.title} screenshot ${shotIndex + 1}`, `${quest.title} - screenshot ${shotIndex + 1}`)}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                          </div>
+                          <div style={{ textAlign: 'center', fontSize: '0.75rem', opacity: 0.72, marginTop: '6px' }}>
+                            Screen { shotIndex + 1}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {windows.games.isOpen && !windows.games.isMinimized && (
+        <div className={`window ${windows.games.isMaximized ? 'maximized' : ''}`} 
+          style={{ 
+            top: windows.games.isMaximized ? 0 : windows.games.y, 
+            left: windows.games.isMaximized ? 0 : windows.games.x, 
+            width: windows.games.isMaximized ? '100vw' : '620px',
+            height: windows.games.isMaximized ? 'calc(100dvh - 45px)' : '470px',
+            zIndex: windows.games.zIndex, 
+            borderRadius: windows.games.isMaximized ? '0' : '8px'
+          }} onMouseDown={() => focusWindow('games')}>
+          <div className="window-header" onMouseDown={(e) => !windows.games.isMaximized && startDrag(e, 'games')}>
+            <div className="window-title">~/games</div>
+            <div className="window-controls">
+              <span className="min-btn" onClick={() => minimizeWindow('games')} style={{ background: '#febc2e'}}></span>
+              <span className="max-btn" onClick={() => maximizeWindow('games')} style={{ background: '#28c840'}}></span>
+              <span className="close-btn" onClick={() => closeWindow('games')}></span>
+            </div>
+          </div>
+          <div className="window-content">
+            <div
+              style={{
+                border: '1px solid var(--border-color)',
+                borderRadius: '6px',
+                padding: '16px',
+                background: 'rgba(255,255,255,0.04)',
+                lineHeight: '1.6'
+              }}
+            >
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', marginBottom: '14px' }}>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', flex: 1, minWidth: '260px' }}>
+                  <div
+                    style={{
+                      width: '80px',
+                      height: '80px',
+                      borderRadius: '18px',
+                      background: '#ffffff',
+                      border: '1px solid rgba(0,0,0,0.08)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <img
+                      src="/images/lost-wood-logo.png"
+                      alt="Lost Woods logo"
+                      style={{ width: '72px', height: '72px', objectFit: 'contain' }}
+                    />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h3 style={{ marginTop: 0, marginBottom: '8px', color: 'var(--accent-color)' }}>Lost Woods</h3>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      <img
+                        src="/logos/react.svg"
+                        alt="React"
+                        style={{ height: '24px', width: 'auto', backgroundColor: '#ffffff', padding: '2px', borderRadius: '4px' }}
+                      />
+                      <img
+                        src="/logos/typescript.svg"
+                        alt="TypeScript"
+                        style={{ height: '24px', width: 'auto', backgroundColor: '#ffffff', padding: '2px', borderRadius: '4px' }}
+                      />
+                      <img
+                        src="/logos/vite.svg"
+                        alt="Vite"
+                        style={{ height: '24px', width: 'auto', backgroundColor: '#ffffff', padding: '2px', borderRadius: '4px' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <a
+                  href="https://lost-woods.netlify.app"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    width: '180px',
+                    textDecoration: 'none',
+                    background: 'var(--accent-color)',
+                    color: 'var(--bg-color)',
+                    fontWeight: 'bold',
+                    padding: '10px 14px',
+                    borderRadius: '4px',
+                    flexShrink: 0
+                  }}
+                >
+                  <span style={{ flex: 1, textAlign: 'center' }}>Open Demo</span>
+                  <img
+                    src="/logos/expand.png"
+                    alt=""
+                    aria-hidden="true"
+                    style={{ width: '16px', height: '16px', marginLeft: '10px', objectFit: 'contain' }}
+                  />
+                </a>
+              </div>
+              <p style={{ marginTop: 0, marginBottom: '12px' }}>
+                A browser-based horror game built with React, TypeScript, and Vite. You cross a haunted forest, collect five keys, unlock an abandoned building, and rescue a kidnapped baby before the ritual is completed.
+              </p>
+              <p style={{ marginBottom: 0 }}>
+                Built around a custom canvas game loop, procedural forest generation, enemy AI, and layered audio, the project focuses on making the tension feel atmospheric.
+              </p>
+            </div>
+            <div
+              style={{
+                marginTop: '18px',
+                paddingTop: '14px',
+                borderTop: '1px dashed var(--border-color)',
+                textAlign: 'center',
+                fontWeight: 'bold',
+                color: 'var(--accent-color)'
+              }}
+            >
+              More games coming soon...
+            </div>
+          </div>
+        </div>
+      )}
+
+      {windows.recycleBin.isOpen && !windows.recycleBin.isMinimized && (
+        <div className={`window ${windows.recycleBin.isMaximized ? 'maximized' : ''}`} 
+          style={{ 
+            top: windows.recycleBin.isMaximized ? 0 : windows.recycleBin.y, 
+            left: windows.recycleBin.isMaximized ? 0 : windows.recycleBin.x, 
+            width: windows.recycleBin.isMaximized ? '100vw' : '420px',
+            height: windows.recycleBin.isMaximized ? 'calc(100dvh - 45px)' : '300px',
+            zIndex: windows.recycleBin.zIndex, 
+            borderRadius: windows.recycleBin.isMaximized ? '0' : '8px'
+          }} onMouseDown={() => focusWindow('recycleBin')}>
+          <div className="window-header" onMouseDown={(e) => !windows.recycleBin.isMaximized && startDrag(e, 'recycleBin')}>
+            <div className="window-title">Recycle</div>
+            <div className="window-controls">
+              <span className="min-btn" onClick={() => minimizeWindow('recycleBin')} style={{ background: '#febc2e'}}></span>
+              <span className="max-btn" onClick={() => maximizeWindow('recycleBin')} style={{ background: '#28c840'}}></span>
+              <span className="close-btn" onClick={() => closeWindow('recycleBin')}></span>
+            </div>
+          </div>
+          <div className="window-content" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '16px' }}>
+            <div style={{ fontSize: '3rem', textAlign: 'center' }}>♻</div>
+            <p style={{ margin: 0, textAlign: 'center', fontSize: '1rem', lineHeight: '1.7' }}>
+              None of my work is thrown away. It just gets recycled into more interesting and better projects.
+            </p>
+            <div
+              style={{
+                margin: '0 auto',
+                padding: '8px 12px',
+                border: '1px dashed var(--border-color)',
+                borderRadius: '999px',
+                fontSize: '0.85rem',
+                opacity: 0.8
+              }}
+            >
+              empty
+            </div>
+          </div>
+        </div>
+      )}
+
       {windows.terminal.isOpen && !windows.terminal.isMinimized && (
         <div className={`window ${windows.terminal.isMaximized ? 'maximized' : ''}`} 
           style={{ 
@@ -804,6 +1160,8 @@ export default function ComputerOS({ onExit }) {
         <div className="start-menu">
           <div className="menu-item" onClick={() => openWindow('about')}>About Me</div>
           <div className="menu-item" onClick={() => openWindow('projects')}>Projects</div>
+          <div className="menu-item" onClick={() => openWindow('games')}>Games</div>
+          <div className="menu-item" onClick={() => openWindow('mobile')}>Mobile</div>
           <div className="menu-item" onClick={() => openWindow('contact')}>Contact</div>
           <hr style={{width: '100%', borderColor: 'var(--border-color)', margin: '5px 0'}}/>
           <div className="menu-item danger" onClick={handleShutdown}><strong>⏻ Shut Down</strong></div>
