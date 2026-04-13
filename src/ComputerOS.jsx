@@ -4,6 +4,7 @@ import emailjs from '@emailjs/browser';
 export default function ComputerOS({ onExit }) {
   const [booted, setBooted] = useState(false);
   const [time, setTime] = useState(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  const [battery, setBattery] = useState(null);
   const formRef = useRef();
   
   const [windows, setWindows] = useState({
@@ -166,6 +167,40 @@ export default function ComputerOS({ onExit }) {
     return () => { clearTimeout(bootTimer); clearInterval(clockTimer); };
   }, []);
 
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || typeof navigator.getBattery !== 'function') {
+      return;
+    }
+
+    let batteryManager;
+
+    const syncBatteryState = () => {
+      if (!batteryManager) return;
+      setBattery({
+        charging: batteryManager.charging,
+        level: Math.round(batteryManager.level * 100)
+      });
+    };
+
+    navigator.getBattery()
+      .then((manager) => {
+        batteryManager = manager;
+        syncBatteryState();
+
+        manager.addEventListener('chargingchange', syncBatteryState);
+        manager.addEventListener('levelchange', syncBatteryState);
+      })
+      .catch((error) => {
+        console.error('Battery API unavailable:', error);
+      });
+
+    return () => {
+      if (!batteryManager) return;
+      batteryManager.removeEventListener('chargingchange', syncBatteryState);
+      batteryManager.removeEventListener('levelchange', syncBatteryState);
+    };
+  }, []);
+
   useEffect(() => { termEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [termHistory]);
 
   useEffect(() => {
@@ -260,6 +295,19 @@ export default function ComputerOS({ onExit }) {
       default: return { '--bg-color': '#0d1117', '--window-bg': '#161b22', '--text-color': '#c9d1d9', '--accent-color': '#58a6ff', '--header-bg': '#21262d', '--border-color': '#30363d', '--scan-color': 'rgba(88, 166, 255, 0.1)' };
     }
   };
+
+  const batteryFillWidth = battery ? `${Math.max(8, battery.level)}%` : '0%';
+  const batteryColor = battery?.charging
+    ? 'var(--accent-color)'
+    : battery && battery.level <= 20
+      ? '#ff5f56'
+      : 'var(--text-color)';
+  const batteryBoltColor = theme === 'matrix'
+    ? '#0b0b0b'
+    : theme === 'light'
+      ? '#000000'
+      : '#ffffff';
+  const batteryBoltStrokeColor = batteryBoltColor === '#ffffff' ? '#000000' : '#ffffff';
 
   if (!booted) return null; 
 
@@ -1178,12 +1226,110 @@ export default function ComputerOS({ onExit }) {
             ))}
           </div>
         </div>
-        <div className="clock"
-          style={{ 
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
             flexShrink: 0,
             marginLeft: '15px',
             whiteSpace: 'nowrap'
-          }}>{time}</div>
+          }}
+        >
+          {battery && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '0.8rem',
+                opacity: 0.9,
+                padding: '2px 8px',
+                border: '1px solid var(--border-color)',
+                borderRadius: '999px',
+                color: batteryColor
+              }}
+              title={battery.charging ? 'Device is charging' : 'Device is running on battery'}
+            >
+              <div
+                aria-hidden="true"
+                style={{
+                  position: 'relative',
+                  width: '18px',
+                  height: '10px',
+                  border: `1px solid ${batteryColor}`,
+                  borderRadius: '2px',
+                  boxSizing: 'border-box',
+                  overflow: 'visible'
+                }}
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '2px',
+                    right: '-3px',
+                    width: '2px',
+                    height: '4px',
+                    borderRadius: '0 1px 1px 0',
+                    background: batteryColor
+                  }}
+                />
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '1px',
+                    left: '1px',
+                    height: '6px',
+                    width: `calc(${batteryFillWidth} - 2px)`,
+                    maxWidth: '14px',
+                    background: batteryColor,
+                    transition: 'width 0.2s ease'
+                  }}
+                />
+                {battery.charging && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '-3px',
+                      left: '4px',
+                      width: '14px',
+                      height: '14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 12 12"
+                      aria-hidden="true"
+                      style={{
+                        display: 'block',
+                        filter: `drop-shadow(0 0 1px ${batteryColor})`
+                      }}
+                    >
+                      <path
+                        d="M7.2 0.8L2.8 6h2.1L4.6 11.2 9.2 5.7H7.1L7.2 0.8z"
+                        fill={batteryBoltColor}
+                        stroke={batteryBoltStrokeColor}
+                        strokeWidth="0.7"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              <span>{battery.level}%</span>
+            </div>
+          )}
+          <div className="clock"
+            style={{ 
+              flexShrink: 0,
+              whiteSpace: 'nowrap'
+            }}>{time}</div>
+        </div>
       </div>
 
       {showStartMenu && (
