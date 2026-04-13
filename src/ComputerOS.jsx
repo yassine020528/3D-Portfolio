@@ -359,6 +359,11 @@ export default function ComputerOS({ onExit }) {
             background: var(--accent-color); color: var(--bg-color); border: none; padding: 8px 16px;
             border-radius: 4px; font-weight: bold; width: 100%;
         }
+        .mobile-app-card { display: flex; gap: 18px; align-items: flex-start; justify-content: space-between; flex-wrap: nowrap; }
+        .mobile-app-content { flex: 1; min-width: 0; }
+        .mobile-app-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+        .mobile-app-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .mobile-app-shots { display: flex; gap: 12px; flex-shrink: 0; }
         .social-link { display: inline-flex; align-items: center; margin-right: 15px; text-decoration: none; color: var(--accent-color); }
         .social-link:hover { text-decoration: underline; }
         .figure-image {
@@ -461,6 +466,17 @@ export default function ComputerOS({ onExit }) {
             .project-image-container {
                 margin-bottom: 15px;
             }
+            .mobile-app-card {
+                flex-wrap: wrap;
+            }
+            .mobile-app-content {
+                width: 100%;
+            }
+            .mobile-app-shots {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
             .fullscreen-figure-overlay {
                 padding: 16px;
             }
@@ -473,6 +489,20 @@ export default function ComputerOS({ onExit }) {
             }
             .fullscreen-figure-image {
                 height: clamp(240px, 58vh, 520px);
+            }
+        }
+
+        @media (max-width: 980px) {
+            .mobile-app-card {
+                flex-wrap: wrap;
+            }
+            .mobile-app-content {
+                min-width: 100%;
+            }
+            .mobile-app-shots {
+                width: 100%;
+                justify-content: flex-start;
+                flex-wrap: wrap;
             }
         }
       `}</style>
@@ -827,7 +857,7 @@ export default function ComputerOS({ onExit }) {
                     background: 'rgba(255,255,255,0.04)'
                   }}
                 >
-                  <div style={{ display: 'flex', gap: '18px', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'nowrap' }}>
+                  <div className="mobile-app-card">
                     <div
                       style={{
                         width: '72px',
@@ -848,9 +878,9 @@ export default function ComputerOS({ onExit }) {
                         style={{ width: '64px', height: '64px', objectFit: 'contain' }}
                       />
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', marginBottom: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                    <div className="mobile-app-content">
+                      <div className="mobile-app-header">
+                        <div className="mobile-app-title-row">
                           <div style={{ color: 'var(--accent-color)', fontWeight: 'bold', fontSize: '1rem' }}>
                             {quest.title}
                           </div>
@@ -882,7 +912,7 @@ export default function ComputerOS({ onExit }) {
                         {quest.description}
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '12px', flexShrink: 0 }}>
+                    <div className="mobile-app-shots">
                       {quest.screenshots.map((shot, shotIndex) => (
                         <div key={`${quest.title}-shot-${shotIndex}`} style={{ width: '108px' }}>
                           <div
