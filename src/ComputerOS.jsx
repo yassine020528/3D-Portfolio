@@ -46,7 +46,7 @@ export default function ComputerOS({ onExit }) {
       appLogo: '/images/android-logo2.png',
       techLogos: ['/logos/kotlin.svg', '/logos/jetpack-compose.svg'],
       screenshots: ['/images/android3.png', '/images/android4.png'],
-      description: 'An Android app for tracking nearby Bluetooth devices and visualizing their movement with GPS trajectories. I combined asynchronous device scanning, Coroutines-based state updates, and a map-driven UI to make live location history easier to follow in real time.'
+      description: 'An Android app for tracking nearby Bluetooth devices. I combined asynchronous device scanning, Coroutines-based state updates, and a map-driven UI to make live location history easier to follow in real time offering live visualization for how to reach them with GPS trajectories.'
     },
     {
       title: 'Running Tracker',
