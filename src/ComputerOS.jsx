@@ -26,6 +26,7 @@ export default function ComputerOS({ onExit }) {
   const termEndRef = useRef(null);
   const dragRef = useRef({ id: null, offsetX: 0, offsetY: 0 });
   const [expandedProjectId, setExpandedProjectId] = useState(null);
+  const [expandedGameId, setExpandedGameId] = useState(null);
   const [fullscreenFigure, setFullscreenFigure] = useState(null);
 
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
@@ -123,6 +124,37 @@ export default function ComputerOS({ onExit }) {
     }
   ];
 
+  const gamesList = [
+    {
+      id: 1,
+      title: "Lost Woods",
+      tech: "React, TypeScript, Vite",
+      appLogo: "/images/lost-woods-logo.png",
+      figureImage: "/images/lost-woods1.png",
+      techLogos: ["/logos/react.svg", "/logos/typescript.svg", "/logos/vite.svg"],
+      description: "A browser horror game where you cross a haunted forest, gather five keys, and break into an abandoned building before the ritual finishes.",
+      details: "I built it around a custom canvas loop, procedural forest generation, enemy AI, and layered audio.",
+      caption: <>Who turned<br />the lights off?</>,
+      figureCaptionText: "Who turned the lights off?",
+      actionLabel: "Open Demo",
+      actionHref: "https://lost-woods.netlify.app"
+    },
+    {
+      id: 2,
+      title: "Chess",
+      tech: "C++, Qt Widgets",
+      appLogo: "/images/desktop-chess-logo.png",
+      figureImage: "/images/desktop-chess1.png",
+      techLogos: ["/logos/c++.svg", "/logos/qt.svg"],
+      description: "A desktop chess app with an interactive 8x8 board, SVG pieces, and click-to-move gameplay built in C++ with Qt Widgets.",
+      details: "The current version already validates standard piece movement, blocking paths, and illegal moves that leave your king exposed.",
+      caption: <>Zero blunders.</>,
+      figureCaptionText: "Zero blunders.",
+      actionLabel: "GitHub Repo",
+      actionHref: "https://github.com/yassine020528/chess-cpp-qt"
+    }
+  ];
+
   const maximizeWindow = (id) => {
     setWindows(prev => ({
       ...prev,
@@ -140,6 +172,10 @@ export default function ComputerOS({ onExit }) {
 
   const toggleProject = (id) => {
     setExpandedProjectId(expandedProjectId === id ? null : id);
+  };
+
+  const toggleGame = (id) => {
+    setExpandedGameId(expandedGameId === id ? null : id);
   };
 
   const playClickSound = () => {
@@ -1014,95 +1050,129 @@ export default function ComputerOS({ onExit }) {
             </div>
           </div>
           <div className="window-content">
-            <div
-              style={{
-                border: '1px solid var(--border-color)',
-                borderRadius: '6px',
-                padding: '16px',
-                background: 'rgba(255,255,255,0.04)',
-                lineHeight: '1.6'
-              }}
-            >
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', marginBottom: '14px' }}>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', flex: 1, minWidth: '260px' }}>
-                  <div
-                    style={{
-                      width: '80px',
-                      height: '80px',
-                      borderRadius: '18px',
-                      background: '#ffffff',
-                      border: '1px solid rgba(0,0,0,0.08)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <img
-                      src="/images/lost-wood-logo.png"
-                      alt="Lost Woods logo"
-                      style={{ width: '72px', height: '72px', objectFit: 'contain' }}
-                    />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <h3 style={{ marginTop: 0, marginBottom: '8px', color: 'var(--accent-color)' }}>Lost Woods</h3>
-                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            {gamesList.map((game) => (
+              <div
+                key={game.id}
+                style={{
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '6px',
+                  background: expandedGameId === game.id ? 'rgba(255,255,255,0.04)' : 'transparent',
+                  marginBottom: '14px',
+                  overflow: 'hidden'
+                }}
+              >
+                <div
+                  onClick={() => toggleGame(game.id)}
+                  style={{
+                    padding: '14px 16px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '12px',
+                    cursor: 'pointer'
+                  }}
+                  className="project-header"
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0 }}>
+                    <div
+                      style={{
+                        width: '62px',
+                        height: '62px',
+                        borderRadius: '14px',
+                        background: '#ffffff',
+                        border: '1px solid rgba(0,0,0,0.08)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        overflow: 'hidden'
+                      }}
+                    >
                       <img
-                        src="/logos/react.svg"
-                        alt="React"
-                        style={{ height: '24px', width: 'auto', backgroundColor: '#ffffff', padding: '2px', borderRadius: '4px' }}
-                      />
-                      <img
-                        src="/logos/typescript.svg"
-                        alt="TypeScript"
-                        style={{ height: '24px', width: 'auto', backgroundColor: '#ffffff', padding: '2px', borderRadius: '4px' }}
-                      />
-                      <img
-                        src="/logos/vite.svg"
-                        alt="Vite"
-                        style={{ height: '24px', width: 'auto', backgroundColor: '#ffffff', padding: '2px', borderRadius: '4px' }}
+                        src={game.appLogo}
+                        alt={`${game.title} logo`}
+                        style={{ width: '54px', height: '54px', objectFit: 'contain' }}
                       />
                     </div>
+                    <div style={{ minWidth: 0 }}>
+                      <h4 style={{ margin: '0 0 5px 0', color: 'var(--accent-color)' }}>
+                        {expandedGameId === game.id ? '🎮 ' : '🕹️ '} {game.title}
+                      </h4>
+                      <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{game.tech}</span>
+                    </div>
                   </div>
+                  <span style={{ transform: expandedGameId === game.id ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.2s' }}>▼</span>
                 </div>
-                <a
-                  href="https://lost-woods.netlify.app"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    width: '180px',
-                    textDecoration: 'none',
-                    background: 'var(--accent-color)',
-                    color: 'var(--bg-color)',
-                    fontWeight: 'bold',
-                    padding: '10px 14px',
-                    borderRadius: '4px',
-                    flexShrink: 0
-                  }}
-                >
-                  <span style={{ flex: 1, textAlign: 'center' }}>Open Demo</span>
-                  <img
-                    src="/logos/expand.png"
-                    alt=""
-                    aria-hidden="true"
-                    style={{ width: '16px', height: '16px', marginLeft: '10px', objectFit: 'contain' }}
-                  />
-                </a>
+
+                {expandedGameId === game.id && (
+                  <div style={{ padding: '0 16px 16px 16px', lineHeight: '1.6', animation: 'fadeIn 0.2s ease' }}>
+                    <div className="project-detail-layout" style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+                      <div style={{ flexGrow: 1, minWidth: 0 }}>
+                        <p style={{ marginTop: 0, marginBottom: '10px', fontSize: '0.95rem' }}>{game.description}</p>
+                        <p style={{ marginTop: 0, marginBottom: '14px', fontSize: '0.95rem' }}>{game.details}</p>
+                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '14px' }}>
+                          {game.techLogos.map((logo, index) => (
+                            <img
+                              key={`${game.title}-logo-${index}`}
+                              src={logo}
+                              alt={`${game.title} tech ${index + 1}`}
+                              style={{ height: '24px', width: 'auto', backgroundColor: '#ffffff', padding: '2px', borderRadius: '4px' }}
+                            />
+                          ))}
+                        </div>
+                        {game.actionHref && (
+                          <a
+                            href={game.actionHref}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              width: '180px',
+                              textDecoration: 'none',
+                              background: 'var(--accent-color)',
+                              color: 'var(--bg-color)',
+                              fontWeight: 'bold',
+                              padding: '10px 14px',
+                              borderRadius: '4px',
+                              flexShrink: 0
+                            }}
+                          >
+                            <span style={{ flex: 1, textAlign: 'center' }}>{game.actionLabel}</span>
+                            <img
+                              src="/logos/expand.png"
+                              alt=""
+                              aria-hidden="true"
+                              style={{ width: '16px', height: '16px', marginLeft: '10px', objectFit: 'contain' }}
+                            />
+                          </a>
+                        )}
+                      </div>
+
+                      <div className="project-image-container" style={{ flexShrink: 0, display: 'block' }}>
+                        <div style={{ width: '120px', height: '120px', margin: '0 auto', background: '#000', border: '1px solid var(--border-color)', display: 'block', borderRadius: '4px', overflow: 'hidden' }}>
+                          <img
+                            src={game.figureImage}
+                            alt={game.title}
+                            className="figure-image"
+                            onClick={() => openFullscreenFigure(game.figureImage, game.title, `Figure ${game.id}: ${game.figureCaptionText}`)}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={(e) => { e.target.style.display='none'; e.target.parentNode.style.color = 'var(--text-color)'; e.target.parentNode.innerText = 'IMG_ERR'; }}
+                          />
+                        </div>
+                        <div style={{ textAlign: 'center', fontSize: '0.75rem', fontStyle: 'italic', opacity: 0.7 }}>
+                          Figure {game.id}: {game.caption}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-              <p style={{ marginTop: 0, marginBottom: '12px' }}>
-                A browser-based horror game built with React, TypeScript, and Vite. You cross a haunted forest, collect five keys, unlock an abandoned building, and rescue a kidnapped baby before the ritual is completed.
-              </p>
-              <p style={{ marginBottom: 0 }}>
-                Built around a custom canvas game loop, procedural forest generation, enemy AI, and layered audio, the project focuses on making the tension feel atmospheric.
-              </p>
-            </div>
+            ))}
             <div
               style={{
-                marginTop: '18px',
+                marginTop: '4px',
                 paddingTop: '14px',
                 borderTop: '1px dashed var(--border-color)',
                 textAlign: 'center',
