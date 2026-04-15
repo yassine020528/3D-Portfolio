@@ -14,6 +14,7 @@ export default function ComputerOS({ onExit }) {
     terminal: { id: 'terminal', title: 'bash', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 250, y: 250 },
     settings: { id: 'settings', title: 'System Preferences', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 200, y: 200 },
     mobile: { id: 'mobile', title: '~/mobile', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 330, y: 60 },
+    vscode: { id: 'vscode', title: 'vscode.exe', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 420, y: 90 },
     recycleBin: { id: 'recycleBin', title: 'Recycle', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 380, y: 160 },
     games: { id: 'games', title: '~/games', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 240, y: 140 },
   });
@@ -27,6 +28,8 @@ export default function ComputerOS({ onExit }) {
   const dragRef = useRef({ id: null, offsetX: 0, offsetY: 0 });
   const [expandedProjectId, setExpandedProjectId] = useState(null);
   const [expandedGameId, setExpandedGameId] = useState(null);
+  const [activeCodeFile, setActiveCodeFile] = useState('main');
+  const [activeCodePanel, setActiveCodePanel] = useState('explorer');
   const [fullscreenFigure, setFullscreenFigure] = useState(null);
 
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
@@ -154,6 +157,50 @@ export default function ComputerOS({ onExit }) {
       actionHref: "https://github.com/yassine020528/chess-cpp-qt"
     }
   ];
+
+  const codeFiles = [
+    {
+      id: 'main',
+      label: 'main.txt',
+      language: 'Markdown',
+      lines: [
+        '# please, take a break',
+        '# grab a coffee and sit back',
+        '# stack overflow can wait',
+        '# breathe in. breathe out.',
+        '# unclench your jaw',
+        '# enjoy the stay'
+      ]
+    },
+    {
+      id: 'todo',
+      label: 'todo-list.md',
+      language: 'Markdown',
+      lines: [
+        'TODO: touch grass / urgent priority',
+        'TODO: sleep / high priority',
+        'TODO: refactor social life',
+        'TODO: git push --force',
+        'TODO: stop saying "one last fix"',
+        'TODO: drink water / low priority',
+      ]
+    },
+    {
+      id: 'readme',
+      label: 'README.md',
+      language: 'Markdown',
+      lines: [
+        'v2.0.1',
+        '- Reduced burnout by 12%',
+        '- Improved back posture',
+        '- Patched brain overheating',
+        '- Optimized sanity, less hallucinations',
+        '- Issue: may still open another terminal'
+      ]
+    }
+  ];
+
+  const currentCodeFile = codeFiles.find((file) => file.id === activeCodeFile) || codeFiles[0];
 
   const maximizeWindow = (id) => {
     setWindows(prev => ({
@@ -344,6 +391,7 @@ export default function ComputerOS({ onExit }) {
       ? '#000000'
       : '#ffffff';
   const batteryBoltStrokeColor = batteryBoltColor === '#ffffff' ? '#000000' : '#ffffff';
+  const vscodeIconBg = theme === 'light' ? '#d1d5db' : '#ffffff';
 
   if (!booted) return null; 
 
@@ -392,8 +440,15 @@ export default function ComputerOS({ onExit }) {
         .icon-terminal { top: calc(var(--desktop-pad) + (var(--desktop-step) * 3)); left: var(--desktop-pad); }
         .icon-games { position: absolute; top: var(--desktop-pad); left: calc(var(--desktop-pad) + var(--desktop-step)); }
         .icon-mobile { position: absolute; top: calc(var(--desktop-pad) + var(--desktop-step)); left: calc(var(--desktop-pad) + var(--desktop-step)); }
+        .icon-vscode { position: absolute; top: calc(var(--desktop-pad) + (var(--desktop-step) * 2)); left: calc(var(--desktop-pad) + var(--desktop-step)); }
         .icon-recycle-bin { position: absolute; top: var(--desktop-pad); right: var(--desktop-pad); }
         .icon-settings { position: absolute; left: var(--desktop-pad); bottom: var(--desktop-pad); }
+        .vscode-icon {
+            width: 26px;
+            height: 26px;
+            object-fit: contain;
+            display: block;
+        }
         
         .window { 
             position: absolute; 
@@ -450,6 +505,228 @@ export default function ComputerOS({ onExit }) {
         .mobile-app-shots { display: flex; gap: 12px; flex-shrink: 0; }
         .social-link { display: inline-flex; align-items: center; margin-right: 15px; text-decoration: none; color: var(--accent-color); }
         .social-link:hover { text-decoration: underline; }
+        .code-window-shell {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+            overflow: hidden;
+        }
+        .code-topbar {
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            background: #181818;
+            border-bottom: 1px solid #2a2a2a;
+            color: #c5c5c5;
+            font-size: 0.82rem;
+            flex-shrink: 0;
+        }
+        .code-body {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .code-activitybar {
+            width: 48px;
+            background: #181818;
+            border-right: 1px solid #2a2a2a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            color: #858585;
+            flex-shrink: 0;
+        }
+        .code-activity-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            cursor: pointer;
+            user-select: none;
+            opacity: 0.72;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+        }
+        .code-activity-item:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+        .code-activitybar .active {
+            color: #ffffff;
+            opacity: 1;
+            position: relative;
+        }
+        .code-activitybar .active::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2px;
+            height: 22px;
+            background: #ffffff;
+            border-radius: 999px;
+            display: block;
+        }
+        .code-sidebar {
+            width: 220px;
+            background: #252526;
+            border-right: 1px solid #2a2a2a;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        .code-sidebar-header {
+            padding: 12px 14px 8px;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #bbbbbb;
+        }
+        .code-search-input {
+            width: calc(100% - 20px);
+            margin: 0 10px 10px;
+            padding: 8px 10px;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            background: #1f1f1f;
+            color: #d4d4d4;
+            font-family: inherit;
+            font-size: 0.82rem;
+        }
+        .code-sidebar-note {
+            padding: 0 14px 12px;
+            font-size: 0.82rem;
+            line-height: 1.6;
+            color: #c9c9c9;
+        }
+        .code-sidebar-muted {
+            color: #8a8a8a;
+        }
+        .code-filetree {
+            padding: 0 10px 12px;
+            font-size: 0.82rem;
+        }
+        .code-filetree-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 6px;
+            border-radius: 4px;
+            color: #d4d4d4;
+        }
+        .code-filetree-row.active {
+            background: #37373d;
+        }
+        .code-main {
+            display: flex;
+            flex: 1;
+            min-width: 0;
+            min-height: 0;
+            background: #1e1e1e;
+        }
+        .code-editor-wrap {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+            min-height: 0;
+        }
+        .code-tabs {
+            display: flex;
+            align-items: stretch;
+            background: #252526;
+            border-bottom: 1px solid #2a2a2a;
+            overflow-x: hidden;
+            flex-shrink: 0;
+        }
+        .code-tab {
+            padding: 10px 14px;
+            font-size: 0.82rem;
+            color: #9d9d9d;
+            border-right: 1px solid #2a2a2a;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .code-tab.active {
+            background: #1e1e1e;
+            color: #ffffff;
+        }
+        .code-editor {
+            display: flex;
+            flex: 1;
+            min-width: 0;
+            min-height: 0;
+            overflow: hidden;
+        }
+        .code-editor-scroll {
+            display: flex;
+            flex: 1;
+            min-width: 0;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .code-gutter {
+            width: 52px;
+            padding: 16px 8px 16px 0;
+            background: #1e1e1e;
+            color: #858585;
+            text-align: right;
+            font-size: 0.84rem;
+            flex-shrink: 0;
+            user-select: none;
+        }
+        .code-content {
+            flex: 1;
+            padding: 16px 18px 16px 10px;
+            min-width: 0;
+            overflow: hidden;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            font-size: 0.9rem;
+        }
+        .code-row {
+            min-height: 28px;
+            display: flex;
+            align-items: flex-start;
+            line-height: 28px;
+        }
+        .code-gutter .code-row {
+            justify-content: flex-end;
+        }
+        .code-statusbar {
+            min-height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 0 10px;
+            background: #007acc;
+            color: #ffffff;
+            font-size: 0.76rem;
+        }
+        .code-statusbar-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            white-space: nowrap;
+        }
+        .code-plain { color: #d4d4d4; }
+        .code-comment { color: #6a9955; }
+        .code-keyword { color: #569cd6; }
+        .code-string { color: #ce9178; }
+        .code-func { color: #dcdcaa; }
+        .code-number { color: #b5cea8; }
         .figure-image {
             cursor: zoom-in;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -550,6 +827,67 @@ export default function ComputerOS({ onExit }) {
             .project-image-container {
                 margin-bottom: 15px;
             }
+            .code-window-shell {
+                font-size: 0.86rem;
+            }
+            .code-topbar {
+                height: 30px;
+                padding: 0 10px;
+                font-size: 0.72rem;
+            }
+            .code-body {
+                display: block;
+            }
+            .code-activitybar,
+            .code-sidebar {
+                display: none;
+            }
+            .code-main,
+            .code-editor-wrap,
+            .code-editor {
+                min-height: 0;
+                height: 300px;
+            }
+            .code-editor-scroll {
+                height: 100%;
+            }
+            .code-tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+            }
+            .code-tab {
+                padding: 9px 10px;
+                font-size: 0.74rem;
+            }
+            .code-gutter {
+                width: 40px;
+                padding: 12px 6px 12px 0;
+                font-size: 0.72rem;
+            }
+            .code-content {
+                padding: 12px 12px 12px 8px;
+                font-size: 0.76rem;
+            }
+            .code-row {
+                min-height: 24px;
+                line-height: 24px;
+            }
+            .code-statusbar {
+                min-height: 34px;
+                padding: 6px 8px;
+                font-size: 0.68rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .code-statusbar-section {
+                gap: 8px;
+                justify-content: center;
+                flex-wrap: wrap;
+                width: 100%;
+            }
+            .code-topbar {
+                justify-content: space-between;
+            }
             .mobile-app-card {
                 flex-wrap: wrap;
             }
@@ -577,6 +915,32 @@ export default function ComputerOS({ onExit }) {
         }
 
         @media (max-width: 980px) {
+            .code-body {
+                flex-direction: column;
+            }
+            .code-activitybar {
+                width: 100%;
+                height: 38px;
+                flex-direction: row;
+                justify-content: center;
+                gap: 18px;
+                padding: 0 10px;
+                border-right: none;
+                border-bottom: 1px solid #2a2a2a;
+            }
+            .code-activitybar .active::before {
+                left: 50%;
+                top: auto;
+                bottom: -10px;
+                transform: translateX(-50%);
+                width: 22px;
+                height: 2px;
+            }
+            .code-sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #2a2a2a;
+            }
             .mobile-app-card {
                 flex-wrap: wrap;
             }
@@ -614,12 +978,18 @@ export default function ComputerOS({ onExit }) {
           <span className="icon-label">Games</span>
         </div>
         <div className="icon icon-settings" onClick={() => openWindow('settings')}>
-          <div className="icon-img" style={{background: '#ccc', color: '#333'}}>⚙️</div>
+          <div className="icon-img" style={{ background: vscodeIconBg }}>⚙️</div>
           <span className="icon-label">Settings</span>
         </div>
         <div className="icon icon-mobile" onClick={() => openWindow('mobile')}>
           <div className="icon-img">📱</div>
           <span className="icon-label">Mobile</span>
+        </div>
+        <div className="icon icon-vscode" onClick={() => openWindow('vscode')}>
+          <div className="icon-img" style={{ background: vscodeIconBg }}>
+            <img src="/images/vscode.png" alt="VS Code" className="vscode-icon" />
+          </div>
+          <span className="icon-label">VS Code</span>
         </div>
         <div className="icon icon-recycle-bin" onClick={() => openWindow('recycleBin')}>
           <div className="icon-img" style={{background: '#8ecae6', color: '#10354a'}}>♻</div>
@@ -1181,6 +1551,155 @@ export default function ComputerOS({ onExit }) {
               }}
             >
               More games coming soon...
+            </div>
+          </div>
+        </div>
+      )}
+
+      {windows.vscode.isOpen && !windows.vscode.isMinimized && (
+        <div className={`window ${windows.vscode.isMaximized ? 'maximized' : ''}`}
+          style={{
+            top: windows.vscode.isMaximized ? 0 : windows.vscode.y,
+            left: windows.vscode.isMaximized ? 0 : windows.vscode.x,
+            width: windows.vscode.isMaximized ? '100vw' : '760px',
+            height: windows.vscode.isMaximized ? 'calc(100dvh - 45px)' : '520px',
+            zIndex: windows.vscode.zIndex,
+            borderRadius: windows.vscode.isMaximized ? '0' : '8px',
+            overflow: 'hidden'
+          }} onMouseDown={() => focusWindow('vscode')}>
+          <div className="window-header" onMouseDown={(e) => !windows.vscode.isMaximized && startDrag(e, 'vscode')} onDoubleClick={() => maximizeWindow('vscode')}>
+            <div className="window-title">VSCode</div>
+            <div className="window-controls">
+              <span className="min-btn" onClick={() => minimizeWindow('vscode')} style={{ background: '#febc2e'}}></span>
+              <span className="max-btn" onClick={() => maximizeWindow('vscode')} style={{ background: '#28c840'}}></span>
+              <span className="close-btn" onClick={() => closeWindow('vscode')}></span>
+            </div>
+          </div>
+          <div className="window-content" style={{ padding: 0, overflow: 'hidden' }}>
+            <div className="code-window-shell">
+              <div className="code-topbar">
+                <div>{currentCodeFile.label}</div>
+                <div>UTF-8</div>
+              </div>
+
+              <div className="code-body">
+                <div className="code-activitybar">
+                  <span className={`code-activity-item ${activeCodePanel === 'explorer' ? 'active' : ''}`} onClick={() => setActiveCodePanel('explorer')}>📁</span>
+                  <span className={`code-activity-item ${activeCodePanel === 'search' ? 'active' : ''}`} onClick={() => setActiveCodePanel('search')}>🔎</span>
+                  <span className={`code-activity-item ${activeCodePanel === 'run' ? 'active' : ''}`} onClick={() => setActiveCodePanel('run')}>▶</span>
+                  <span className={`code-activity-item ${activeCodePanel === 'extensions' ? 'active' : ''}`} onClick={() => setActiveCodePanel('extensions')}>🧩</span>
+                </div>
+
+                <div className="code-sidebar">
+                  {activeCodePanel === 'explorer' && (
+                    <>
+                      <div className="code-sidebar-header">Explorer</div>
+                      <div className="code-filetree">
+                        <div className="code-filetree-row">portfolio</div>
+                        <div className="code-filetree-row">notes</div>
+                        {codeFiles.map((file) => (
+                          <div
+                            key={file.id}
+                            className={`code-filetree-row ${currentCodeFile.id === file.id ? 'active' : ''}`}
+                            onClick={() => setActiveCodeFile(file.id)}
+                            style={{ paddingLeft: '18px', cursor: 'pointer' }}
+                          >
+                            {file.label}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+
+                  {activeCodePanel === 'search' && (
+                    <>
+                      <div className="code-sidebar-header">Search</div>
+                      <input className="code-search-input" value="job" readOnly />
+                      <div className="code-sidebar-note">
+                        <div className="code-sidebar-muted">0 results in workspace</div>
+                        <div style={{ marginTop: '10px' }}>No results found.</div>
+                      </div>
+                    </>
+                  )}
+
+                  {activeCodePanel === 'run' && (
+                    <>
+                      <div className="code-sidebar-header">Run And Debug</div>
+                      <div className="code-sidebar-note">
+                        <div className="code-sidebar-muted" style={{ marginBottom: '10px' }}>Nothing is running right now.</div>
+                      </div>
+                    </>
+                  )}
+
+                  {activeCodePanel === 'extensions' && (
+                    <>
+                      <div className="code-sidebar-header">Extensions</div>
+                      <div className="code-sidebar-note">
+                        <div style={{ marginBottom: '10px' }}>Recommended install pack:</div>
+                        <div>☕ `Caffeine Plugin`</div>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <div className="code-main">
+                  <div className="code-editor-wrap">
+                    <div className="code-tabs">
+                      {codeFiles.map((file) => (
+                        <div
+                          key={file.id}
+                          className={`code-tab ${currentCodeFile.id === file.id ? 'active' : ''}`}
+                          onClick={() => setActiveCodeFile(file.id)}
+                        >
+                          {file.label}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="code-editor">
+                      <div className="code-editor-scroll">
+                        <div className="code-gutter">
+                          {currentCodeFile.lines.map((_, index) => (
+                            <div key={`${currentCodeFile.id}-line-${index + 1}`} className="code-row">
+                              {index + 1}
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="code-content">
+                          {currentCodeFile.lines.map((line, index) => (
+                            <div key={`${currentCodeFile.id}-content-${index + 1}`} className="code-row">
+                              {currentCodeFile.id === 'main' && <span className="code-comment">{line}</span>}
+                              {currentCodeFile.id === 'todo' && (
+                                <>
+                                  <span className="code-keyword">TODO</span>
+                                  <span className="code-plain">{line.slice(4)}</span>
+                                </>
+                              )}
+                              {currentCodeFile.id === 'readme' && (
+                                <span className={index === 0 ? 'code-number' : 'code-plain'}>{line}</span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="code-statusbar">
+                <div className="code-statusbar-section">
+                  <span>main</span>
+                  <span>Break Mode</span>
+                  <span>0 problems</span>
+                </div>
+                <div className="code-statusbar-section">
+                  <span>Spaces: 2</span>
+                  <span>{currentCodeFile.language}</span>
+                  <span>Ln {currentCodeFile.lines.length}, Col 1</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
