@@ -37,7 +37,7 @@ export default function FigureThumbnail({
           alt={alt}
           className="figure-image"
           onClick={onOpen}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', ...imageStyle }}
+          style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', ...imageStyle }}
           onError={(event) => {
             event.target.style.display = 'none';
             event.target.parentNode.style.color = 'var(--text-color)';
