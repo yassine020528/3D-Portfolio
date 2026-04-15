@@ -13,7 +13,7 @@ export default function VscodeWindow({
   return (
     <WindowFrame
       windowId="vscode"
-      title="VSCode"
+      title="vscode.exe"
       windowState={windowState}
       width="760px"
       height="520px"

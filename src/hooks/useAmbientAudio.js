@@ -3,10 +3,121 @@ import { useEffect, useRef, useState } from 'react';
 export default function useAmbientAudio({ src, enabled = true, active = true, muffled = false, gain = 0.5 }) {
   const [isEnabled, setIsEnabled] = useState(enabled);
   const audioContextRef = useRef(null);
-  const sourceRef = useRef(null);
-  const gainNodeRef = useRef(null);
+  const masterGainRef = useRef(null);
   const filterNodeRef = useRef(null);
   const bufferRef = useRef(null);
+  const stopTimeoutRef = useRef(null);
+  const loopTimeoutRef = useRef(null);
+  const loopLayersRef = useRef(new Set());
+
+  const clearLoopTimeout = () => {
+    if (loopTimeoutRef.current) {
+      window.clearTimeout(loopTimeoutRef.current);
+      loopTimeoutRef.current = null;
+    }
+  };
+
+  const clearStopTimeout = () => {
+    if (stopTimeoutRef.current) {
+      window.clearTimeout(stopTimeoutRef.current);
+      stopTimeoutRef.current = null;
+    }
+  };
+
+  const disconnectLayer = (layer) => {
+    layer.source.onended = null;
+
+    try {
+      layer.source.disconnect();
+    } catch (error) {
+      console.error(error);
+    }
+
+    try {
+      layer.gainNode.disconnect();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const stopAllLayers = () => {
+    loopLayersRef.current.forEach((layer) => {
+      try {
+        layer.source.stop();
+      } catch (error) {
+        console.error(error);
+      }
+
+      disconnectLayer(layer);
+    });
+
+    loopLayersRef.current.clear();
+  };
+
+  const createLoopLayer = ({ context, buffer, startTime, fadeInDuration = 0 }) => {
+    const layerGain = context.createGain();
+    const source = context.createBufferSource();
+
+    source.buffer = buffer;
+    source.connect(layerGain);
+    layerGain.connect(filterNodeRef.current);
+
+    layerGain.gain.cancelScheduledValues(startTime);
+    layerGain.gain.setValueAtTime(fadeInDuration > 0 ? 0 : 1, startTime);
+
+    if (fadeInDuration > 0) {
+      layerGain.gain.linearRampToValueAtTime(1, startTime + fadeInDuration);
+    }
+
+    const layer = { source, gainNode: layerGain };
+    source.onended = () => {
+      loopLayersRef.current.delete(layer);
+      disconnectLayer(layer);
+    };
+
+    source.start(startTime);
+    loopLayersRef.current.add(layer);
+
+    return layer;
+  };
+
+  const scheduleLoop = (startTime) => {
+    const context = audioContextRef.current;
+    const buffer = bufferRef.current;
+    const currentLayer = [...loopLayersRef.current].at(-1);
+
+    if (!context || !buffer || !currentLayer) {
+      return;
+    }
+
+    const overlapDuration = Math.min(0.18, buffer.duration / 4);
+    const nextStartTime = startTime + Math.max(buffer.duration - overlapDuration, 0.01);
+    const scheduleDelay = Math.max((nextStartTime - context.currentTime - 0.05) * 1000, 0);
+
+    clearLoopTimeout();
+
+    loopTimeoutRef.current = window.setTimeout(() => {
+      if (!audioContextRef.current || !bufferRef.current || !loopLayersRef.current.has(currentLayer)) {
+        return;
+      }
+
+      const nextLayer = createLoopLayer({
+        context,
+        buffer,
+        startTime: nextStartTime,
+        fadeInDuration: overlapDuration,
+      });
+
+      currentLayer.gainNode.gain.cancelScheduledValues(nextStartTime);
+      currentLayer.gainNode.gain.setValueAtTime(currentLayer.gainNode.gain.value, nextStartTime);
+      currentLayer.gainNode.gain.linearRampToValueAtTime(0, nextStartTime + overlapDuration);
+      currentLayer.source.stop(nextStartTime + overlapDuration);
+
+      scheduleLoop(nextStartTime);
+
+      return nextLayer;
+    }, scheduleDelay);
+  };
 
   const playAudio = () => {
     const context = audioContextRef.current;
@@ -20,44 +131,53 @@ export default function useAmbientAudio({ src, enabled = true, active = true, mu
       context.resume();
     }
 
-    if (sourceRef.current) {
+    if (loopLayersRef.current.size > 0) {
       return;
     }
 
-    const source = context.createBufferSource();
-    source.buffer = buffer;
-    source.loop = true;
-    source.connect(filterNodeRef.current);
-    filterNodeRef.current.connect(gainNodeRef.current);
-    source.start(0);
-    sourceRef.current = source;
+    const startTime = context.currentTime;
 
-    gainNodeRef.current.gain.cancelScheduledValues(context.currentTime);
-    gainNodeRef.current.gain.setValueAtTime(0, context.currentTime);
-    gainNodeRef.current.gain.linearRampToValueAtTime(gain, context.currentTime + 2);
+    createLoopLayer({
+      context,
+      buffer,
+      startTime,
+    });
+    scheduleLoop(startTime);
+
+    masterGainRef.current.gain.cancelScheduledValues(startTime);
+    masterGainRef.current.gain.setValueAtTime(0, startTime);
+    masterGainRef.current.gain.linearRampToValueAtTime(gain, startTime + 2);
   };
 
-  const stopAudio = () => {
+  const stopAudio = ({ immediate = false } = {}) => {
     const context = audioContextRef.current;
-    const source = sourceRef.current;
 
-    if (!context || !source) {
+    if (!context || loopLayersRef.current.size === 0) {
+      return;
+    }
+
+    clearLoopTimeout();
+    clearStopTimeout();
+
+    masterGainRef.current.gain.cancelScheduledValues(context.currentTime);
+
+    if (immediate) {
+      stopAllLayers();
+      masterGainRef.current.gain.setValueAtTime(0, context.currentTime);
       return;
     }
 
     const fadeOutDuration = 1;
-    gainNodeRef.current.gain.cancelScheduledValues(context.currentTime);
-    gainNodeRef.current.gain.setValueAtTime(gainNodeRef.current.gain.value, context.currentTime);
-    gainNodeRef.current.gain.linearRampToValueAtTime(0, context.currentTime + fadeOutDuration);
+    masterGainRef.current.gain.setValueAtTime(masterGainRef.current.gain.value, context.currentTime);
+    masterGainRef.current.gain.linearRampToValueAtTime(0, context.currentTime + fadeOutDuration);
 
-    window.setTimeout(() => {
-      if (!sourceRef.current) {
+    stopTimeoutRef.current = window.setTimeout(() => {
+      if (loopLayersRef.current.size === 0) {
         return;
       }
 
-      sourceRef.current.stop();
-      sourceRef.current.disconnect();
-      sourceRef.current = null;
+      stopAllLayers();
+      stopTimeoutRef.current = null;
     }, fadeOutDuration * 1000);
   };
 
@@ -76,9 +196,10 @@ export default function useAmbientAudio({ src, enabled = true, active = true, mu
     filterNode.frequency.value = 20000;
     gainNode.gain.value = 0;
     gainNode.connect(context.destination);
+    filterNode.connect(gainNode);
 
     audioContextRef.current = context;
-    gainNodeRef.current = gainNode;
+    masterGainRef.current = gainNode;
     filterNodeRef.current = filterNode;
 
     fetch(src)
@@ -94,10 +215,9 @@ export default function useAmbientAudio({ src, enabled = true, active = true, mu
       .catch((error) => console.error(error));
 
     return () => {
-      if (sourceRef.current) {
-        sourceRef.current.stop();
-        sourceRef.current.disconnect();
-      }
+      clearLoopTimeout();
+      clearStopTimeout();
+      stopAllLayers();
 
       context.close();
     };
@@ -133,7 +253,7 @@ export default function useAmbientAudio({ src, enabled = true, active = true, mu
     stopAudio,
     toggleSound: () => {
       if (isEnabled) {
-        stopAudio();
+        stopAudio({ immediate: true });
         setIsEnabled(false);
         return;
       }

@@ -1,4 +1,5 @@
 import { startMenuItems } from '../../data/osData';
+import SoundToggleButton from '../../components/shared/SoundToggleButton';
 
 function BatteryIndicator({ battery, batteryColor, batteryFillWidth, batteryBoltColor, batteryBoltStrokeColor }) {
   if (!battery) {
@@ -95,6 +96,8 @@ function BatteryIndicator({ battery, batteryColor, batteryFillWidth, batteryBolt
 export default function Taskbar({
   windows,
   battery,
+  soundEnabled,
+  toggleSound,
   time,
   showStartMenu,
   setShowStartMenu,
@@ -153,6 +156,20 @@ export default function Taskbar({
             whiteSpace: 'nowrap',
           }}
         >
+          <SoundToggleButton
+            enabled={soundEnabled}
+            onToggle={toggleSound}
+            iconColor="var(--text-color)"
+            title={soundEnabled ? 'Mute ambient audio' : 'Unmute ambient audio'}
+            style={{
+              width: '34px',
+              height: '34px',
+              padding: 0,
+              background: 'transparent',
+              border: '1px solid var(--border-color)',
+              borderRadius: '999px',
+            }}
+          />
           <BatteryIndicator
             battery={battery}
             batteryColor={batteryColor}

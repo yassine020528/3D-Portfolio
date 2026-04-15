@@ -10,7 +10,8 @@ import Yassine from '../Yassine';
 import LoadingScreen from '../components/shared/LoadingScreen';
 import OccludedHtml from '../components/shared/OccludedHtml';
 import StatusOverlay from '../components/shared/StatusOverlay';
-import { playClickSound } from '../lib/sound';
+import useAmbientAudio from '../hooks/useAmbientAudio';
+import { playClickSound, playPowerToggleSound } from '../lib/sound';
 
 function CameraRig({ view, controlsRef, setIsReturning, isReturning }) {
   useFrame((state, delta) => {
@@ -161,6 +162,11 @@ export default function HomePage() {
   const [showBio, setShowBio] = useState(false);
   const controlsRef = useRef(null);
   const isMobile = window.innerWidth < 768;
+  const { soundEnabled, toggleSound } = useAmbientAudio({
+    src: '/sounds/ambient.mp3',
+    active: started,
+    muffled: view === 'screen',
+  });
 
   useEffect(() => {
     if (started && view === 'room') {
@@ -172,9 +178,19 @@ export default function HomePage() {
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
       {!started && <LoadingScreen onStarted={() => setStarted(true)} />}
 
-      <StatusOverlay visible={started} ambientTrack="/sounds/ambient.mp3" muffled={view === 'screen'} />
+      <StatusOverlay
+        visible={started}
+        soundEnabled={soundEnabled}
+        toggleSound={toggleSound}
+      />
       <Bio visible={showBio && view === 'room'} onClose={() => setShowBio(false)} />
-      {view === 'screen' && <ComputerOS onExit={() => setView('room')} />}
+      {view === 'screen' && (
+        <ComputerOS
+          onExit={() => setView('room')}
+          soundEnabled={soundEnabled}
+          toggleSound={toggleSound}
+        />
+      )}
 
       <Canvas shadows camera={{ position: isMobile ? [0, 250, 500] : [0, 200, 300], fov: isMobile ? 90 : 45 }}>
         <DynamicBackground />
@@ -196,6 +212,7 @@ export default function HomePage() {
         <Suspense fallback={null}>
           <RoomModel
             onComputerClick={() => {
+              playPowerToggleSound();
               setView('screen');
               setShowBio(false);
             }}

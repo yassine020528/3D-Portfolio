@@ -1,20 +1,13 @@
 import useClock from '../../hooks/useClock';
-import useAmbientAudio from '../../hooks/useAmbientAudio';
-import { playClickSound } from '../../lib/sound';
-import SpeakerIcon from './SpeakerIcon';
+import SoundToggleButton from './SoundToggleButton';
 
 export default function StatusOverlay({
   visible,
-  ambientTrack,
-  muffled = false,
   subtitle = 'Computer Engineering Student',
+  soundEnabled,
+  toggleSound,
 }) {
   const time = useClock();
-  const { soundEnabled, toggleSound } = useAmbientAudio({
-    src: ambientTrack,
-    active: visible,
-    muffled,
-  });
 
   const boxStyle = {
     backgroundColor: 'black',
@@ -44,24 +37,15 @@ export default function StatusOverlay({
       <div style={boxStyle}>{subtitle}</div>
       <div style={{ display: 'flex', gap: '10px', pointerEvents: 'auto' }}>
         <div style={boxStyle}>{time}</div>
-        <button
-          type="button"
-          onClick={() => {
-            playClickSound();
-            toggleSound();
-          }}
+        <SoundToggleButton
+          enabled={soundEnabled}
+          onToggle={toggleSound}
+          title={soundEnabled ? 'Mute ambient audio' : 'Unmute ambient audio'}
           style={{
             ...boxStyle,
-            border: 'none',
-            cursor: 'pointer',
             minWidth: '40px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
           }}
-        >
-          <SpeakerIcon enabled={soundEnabled} />
-        </button>
+        />
       </div>
     </div>
   );

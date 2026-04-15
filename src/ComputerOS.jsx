@@ -64,7 +64,7 @@ function useBatteryStatus() {
   return battery;
 }
 
-export default function ComputerOS({ onExit }) {
+export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
   const [booted, setBooted] = useState(false);
   const [theme, setTheme] = useState('dark');
   const [showStartMenu, setShowStartMenu] = useState(false);
@@ -178,7 +178,7 @@ export default function ComputerOS({ onExit }) {
         break;
       case 'vscode':
         openWindow('vscode');
-        response = 'Opening VSCode...';
+        response = 'Launching vscode.exe...';
         break;
       case 'recycle':
         openWindow('recycle');
@@ -231,7 +231,6 @@ export default function ComputerOS({ onExit }) {
   };
 
   useEffect(() => {
-    playPowerToggleSound();
     const bootTimer = window.setTimeout(() => setBooted(true), 1000);
     return () => window.clearTimeout(bootTimer);
   }, []);
@@ -337,6 +336,8 @@ export default function ComputerOS({ onExit }) {
       <Taskbar
         windows={windows}
         battery={battery}
+        soundEnabled={soundEnabled}
+        toggleSound={toggleSound}
         time={time}
         showStartMenu={showStartMenu}
         setShowStartMenu={setShowStartMenu}
