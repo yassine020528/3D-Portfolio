@@ -6,6 +6,7 @@ export const initialWindows = {
   settings: { id: 'settings', title: 'System Preferences', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 200, y: 200 },
   mobile: { id: 'mobile', title: '~/mobile', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 330, y: 60 },
   vscode: { id: 'vscode', title: 'vscode.exe', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 420, y: 90 },
+  flower: { id: 'flower', title: 'flower.mp4', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 250, y: 40 },
   recycle: { id: 'recycle', title: 'Recycle', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 380, y: 160 },
   games: { id: 'games', title: '~/games', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 240, y: 140 },
 };
@@ -33,6 +34,7 @@ export const desktopIcons = [
   { id: 'settings', label: 'Settings', icon: '⚙️', className: 'icon-settings', usesVsCodeBackground: true },
   { id: 'mobile', label: 'Mobile', icon: '📱', className: 'icon-mobile' },
   { id: 'vscode', label: 'VS Code', className: 'icon-vscode', isImageIcon: true, usesVsCodeBackground: true, imageSrc: '/images/vscode.png', imageAlt: 'VS Code' },
+  { id: 'flower', label: 'Flower', icon: '🌸', className: 'icon-flower', iconStyle: { background: 'linear-gradient(135deg, #ffd0dd 0%, #e9b8ff 100%)', color: '#5c2345' } },
   { id: 'recycle', label: 'Recycle', icon: '♻', className: 'icon-recycle', iconStyle: { background: '#8ecae6', color: '#10354a' } },
 ];
 
@@ -41,6 +43,7 @@ export const startMenuItems = [
   { id: 'projects', label: 'Projects' },
   { id: 'games', label: 'Games' },
   { id: 'mobile', label: 'Mobile' },
+  { id: 'flower', label: 'Flower' },
   { id: 'vscode', label: 'VS Code' },
   { id: 'contact', label: 'Contact' },
 ];

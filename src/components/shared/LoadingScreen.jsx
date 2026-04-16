@@ -18,7 +18,7 @@ const overlayStyle = {
   fontFamily: 'monospace',
 };
 
-export default function LoadingScreen({ onStarted }) {
+export default function LoadingScreen({ onStarted, onUnlockAudio }) {
   const { progress } = useProgress();
 
   return (
@@ -32,6 +32,12 @@ export default function LoadingScreen({ onStarted }) {
       {progress === 100 && (
         <button
           type="button"
+          onPointerDown={() => {
+            onUnlockAudio?.();
+          }}
+          onTouchStart={() => {
+            onUnlockAudio?.();
+          }}
           onClick={() => {
             playClickSound();
             onStarted();

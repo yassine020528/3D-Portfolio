@@ -11,6 +11,7 @@ import osStyles from './features/os/osStyles';
 import Taskbar from './features/os/Taskbar';
 import AboutWindow from './features/os/windows/AboutWindow';
 import ContactWindow from './features/os/windows/ContactWindow';
+import FlowerWindow from './features/os/windows/FlowerWindow';
 import GamesWindow from './features/os/windows/GamesWindow';
 import MobileWindow from './features/os/windows/MobileWindow';
 import ProjectsWindow from './features/os/windows/ProjectsWindow';
@@ -154,7 +155,7 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
 
     switch (normalizedCommand) {
       case 'help':
-        response = 'Available: help, about, projects, contact, games, mobile, vscode, recycle, clear, exit';
+        response = 'Available: help, about, projects, contact, games, mobile, flower, vscode, recycle, clear, exit';
         break;
       case 'about':
         openWindow('about');
@@ -179,6 +180,10 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
       case 'vscode':
         openWindow('vscode');
         response = 'Launching vscode.exe...';
+        break;
+      case 'flower':
+        openWindow('flower');
+        response = 'Opening flower.mp4...';
         break;
       case 'recycle':
         openWindow('recycle');
@@ -322,6 +327,7 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
         activeCodePanel={activeCodePanel}
         setActiveCodePanel={setActiveCodePanel}
       />
+      <FlowerWindow windowState={windows.flower} controls={controlsFor('flower')} />
       <RecycleWindow windowState={windows.recycle} controls={controlsFor('recycle')} />
       <TerminalWindow
         windowState={windows.terminal}

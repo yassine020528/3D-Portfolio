@@ -34,16 +34,27 @@ export default function WindowFrame({
   titleStyle,
   frameStyle,
   maximizeOnDoubleClick = false,
+  preserveOnMinimize = false,
 }) {
-  if (!windowState.isOpen || windowState.isMinimized) {
+  if (!windowState.isOpen) {
+    return null;
+  }
+
+  const isVisuallyHidden = preserveOnMinimize && windowState.isMinimized;
+
+  if (windowState.isMinimized && !preserveOnMinimize) {
     return null;
   }
 
   return (
     <div
       className={`window ${windowState.isMaximized ? 'maximized' : ''} ${className}`.trim()}
-      style={getWindowStyle(windowState, width, height, frameStyle)}
+      style={{
+        ...getWindowStyle(windowState, width, height, frameStyle),
+        ...(isVisuallyHidden ? { display: 'none' } : null),
+      }}
       onMouseDown={onFocus}
+      aria-hidden={isVisuallyHidden}
     >
       <div
         className="window-header"

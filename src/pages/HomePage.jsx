@@ -162,7 +162,7 @@ export default function HomePage() {
   const [showBio, setShowBio] = useState(false);
   const controlsRef = useRef(null);
   const isMobile = window.innerWidth < 768;
-  const { soundEnabled, toggleSound } = useAmbientAudio({
+  const { soundEnabled, toggleSound, unlockAudio } = useAmbientAudio({
     src: '/sounds/ambient.mp3',
     active: started,
     muffled: view === 'screen',
@@ -176,7 +176,7 @@ export default function HomePage() {
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
-      {!started && <LoadingScreen onStarted={() => setStarted(true)} />}
+      {!started && <LoadingScreen onStarted={() => setStarted(true)} onUnlockAudio={unlockAudio} />}
 
       <StatusOverlay
         visible={started}

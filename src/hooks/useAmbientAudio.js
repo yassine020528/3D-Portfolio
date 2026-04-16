@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-export default function useAmbientAudio({ src, enabled = true, active = true, muffled = false, gain = 0.5 }) {
+export default function useAmbientAudio({ src, enabled = true, active = true, muffled = false, gain = 0.65 }) {
   const [isEnabled, setIsEnabled] = useState(enabled);
   const audioContextRef = useRef(null);
   const masterGainRef = useRef(null);
@@ -9,6 +9,7 @@ export default function useAmbientAudio({ src, enabled = true, active = true, mu
   const stopTimeoutRef = useRef(null);
   const loopTimeoutRef = useRef(null);
   const loopLayersRef = useRef(new Set());
+  const hasUnlockedRef = useRef(false);
 
   const clearLoopTimeout = () => {
     if (loopTimeoutRef.current) {
@@ -119,6 +120,39 @@ export default function useAmbientAudio({ src, enabled = true, active = true, mu
     }, scheduleDelay);
   };
 
+  const unlockAudioContext = () => {
+    const context = audioContextRef.current;
+
+    if (!context) {
+      return;
+    }
+
+    if (navigator.audioSession && navigator.audioSession.type !== 'playback') {
+      try {
+        navigator.audioSession.type = 'playback';
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    if (context.state !== 'running') {
+      context.resume().catch((error) => console.error(error));
+    }
+
+    if (!hasUnlockedRef.current) {
+      const silentBuffer = context.createBuffer(1, 1, 22050);
+      const source = context.createBufferSource();
+      source.buffer = silentBuffer;
+      source.connect(context.destination);
+      try {
+        source.start(0);
+        hasUnlockedRef.current = true;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
   const playAudio = () => {
     const context = audioContextRef.current;
     const buffer = bufferRef.current;
@@ -127,9 +161,7 @@ export default function useAmbientAudio({ src, enabled = true, active = true, mu
       return;
     }
 
-    if (context.state === 'suspended') {
-      context.resume();
-    }
+    unlockAudioContext();
 
     if (loopLayersRef.current.size > 0) {
       return;
@@ -250,6 +282,7 @@ export default function useAmbientAudio({ src, enabled = true, active = true, mu
     soundEnabled: isEnabled,
     setSoundEnabled: setIsEnabled,
     playAudio,
+    unlockAudio: unlockAudioContext,
     stopAudio,
     toggleSound: () => {
       if (isEnabled) {

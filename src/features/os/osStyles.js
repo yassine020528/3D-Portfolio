@@ -36,6 +36,7 @@ const osStyles = `
   .icon-games { position: absolute; top: var(--desktop-pad); left: calc(var(--desktop-pad) + var(--desktop-step)); }
   .icon-mobile { position: absolute; top: calc(var(--desktop-pad) + var(--desktop-step)); left: calc(var(--desktop-pad) + var(--desktop-step)); }
   .icon-vscode { position: absolute; top: calc(var(--desktop-pad) + (var(--desktop-step) * 2)); left: calc(var(--desktop-pad) + var(--desktop-step)); }
+  .icon-flower { position: absolute; top: var(--desktop-pad); right: calc(var(--desktop-pad) + var(--desktop-step)); }
   .icon-recycle { position: absolute; top: var(--desktop-pad); right: var(--desktop-pad); }
   .icon-settings { position: absolute; left: var(--desktop-pad); bottom: var(--desktop-pad); }
   .vscode-icon { width: 26px; height: 26px; object-fit: contain; display: block; }
@@ -237,14 +238,208 @@ const osStyles = `
   .fullscreen-figure-caption { text-align: center; font-size: 0.9rem; color: #f5f5f5; opacity: 0.9; }
   .fullscreen-figure-close { position: absolute; top: -8px; right: -8px; width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.2); border-radius: 999px; background: rgba(20,20,20,0.92); color: #fff; font-size: 1.4rem; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .fullscreen-figure-hint { font-size: 0.8rem; color: rgba(255,255,255,0.7); }
+  .flower-window-content {
+    min-height: 360px;
+    height: 100%;
+  }
+  .flower-window-content .app-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    background:
+      radial-gradient(circle at top, rgba(255,214,229,0.08), transparent 35%),
+      linear-gradient(180deg, #050505 0%, #000000 100%);
+    overflow: hidden;
+  }
+  .flower-window-content canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .flower-loader {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #000000;
+    transition: opacity 0.8s ease;
+  }
+  .flower-loader.fade { opacity: 0; pointer-events: none; }
+  .flower-loader-title,
+  .flower-loader-pct,
+  .flower-window-content .label-small,
+  .flower-window-content .text-btn,
+  .flower-start-btn {
+    font-family: "Courier New", monospace;
+  }
+  .flower-loader-title {
+    color: #ffffff;
+    font-size: 14px;
+    letter-spacing: 0.35em;
+    opacity: 0.72;
+    margin-bottom: 24px;
+  }
+  .flower-loader-bar-bg {
+    width: 180px;
+    height: 3px;
+    background: #1a1a1a;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .flower-loader-bar-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #cf8099, #f3c8ff);
+    transition: width 0.15s ease;
+  }
+  .flower-loader-pct {
+    margin-top: 10px;
+    color: rgba(255,255,255,0.38);
+    font-size: 11px;
+  }
+  .flower-window-content .enter-overlay,
+  .flower-window-content .ui-overlay {
+    position: absolute;
+    inset: 0;
+  }
+  .flower-window-content .enter-overlay {
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s ease;
+    background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.3));
+  }
+  .flower-window-content .enter-overlay.visible { opacity: 1; pointer-events: auto; }
+  .flower-start-btn {
+    border: 1px solid rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.04);
+    color: #ffffff;
+    padding: 12px 30px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    font-size: 0.8rem;
+    backdrop-filter: blur(8px);
+  }
+  .flower-start-btn:hover {
+    background: rgba(255,255,255,0.92);
+    color: #060606;
+    border-color: rgba(255,255,255,0.92);
+  }
+  .flower-window-content .ui-overlay {
+    z-index: 6;
+    display: flex;
+    align-items: flex-start;
+    padding: 18px;
+    pointer-events: none;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+  }
+  .flower-window-content .ui-overlay.hidden { opacity: 0; visibility: hidden; }
+  .flower-controls-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+    max-width: 140px;
+    pointer-events: auto;
+  }
+  .flower-window-content .mode-group {
+    width: 100%;
+    padding: 8px 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    backdrop-filter: none;
+  }
+  .flower-window-content .label-small {
+    margin-bottom: 6px;
+    color: rgba(255,255,255,0.38);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .flower-window-content .text-btn {
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.58);
+    padding: 2px 0;
+    border-radius: 0;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color 0.2s ease, opacity 0.2s ease;
+    cursor: pointer;
+  }
+  .flower-window-content .text-btn:hover,
+  .flower-window-content .text-btn:focus-visible,
+  .flower-window-content .text-btn.active {
+    color: #ffffff;
+    opacity: 1;
+    outline: none;
+  }
+  .flower-audio-credit {
+    position: absolute;
+    left: 18px;
+    bottom: 18px;
+    color: rgba(255,255,255,0.58);
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+  .flower-hidden-input { display: none; }
 
   @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
   @media (max-width: 768px) {
+    .desktop {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      align-content: start;
+      justify-items: stretch;
+      gap: 12px 10px;
+      padding: 16px 12px;
+      overflow-y: auto;
+    }
+    .desktop .icon {
+      position: static !important;
+      inset: auto !important;
+      left: auto !important;
+      right: auto !important;
+      top: auto !important;
+      bottom: auto !important;
+      width: 100%;
+      max-width: none;
+      min-height: 88px;
+      justify-content: flex-start;
+    }
+    .desktop .icon-about { grid-column: 1; grid-row: 1; }
+    .desktop .icon-projects { grid-column: 1; grid-row: 2; }
+    .desktop .icon-contact { grid-column: 1; grid-row: 3; }
+    .desktop .icon-terminal { grid-column: 1; grid-row: 4; }
+    .desktop .icon-games { grid-column: 2; grid-row: 1; }
+    .desktop .icon-mobile { grid-column: 2; grid-row: 2; }
+    .desktop .icon-vscode { grid-column: 2; grid-row: 3; }
+    .desktop .icon-settings {
+      position: absolute !important;
+      left: 12px !important;
+      bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+      width: calc((100% - 54px) / 4);
+      grid-column: auto;
+      grid-row: auto;
+    }
+    .desktop .icon-flower { grid-column: 3; grid-row: 1; }
+    .desktop .icon-recycle { grid-column: 4; grid-row: 1; }
     .window:not(.maximized) {
       width: 95vw !important;
       max-height: calc(100dvh - 85px - env(safe-area-inset-bottom)) !important;
-      height: auto !important;
       left: 50% !important;
       top: 50% !important;
       transform: translate(-50%, -55%) !important;
@@ -257,6 +452,10 @@ const osStyles = `
       left: 0 !important;
       top: 0 !important;
       border-radius: 0;
+    }
+    .flower-window:not(.maximized) {
+      height: 460px !important;
+      max-height: calc(100dvh - 120px - env(safe-area-inset-bottom)) !important;
     }
     .window-content { padding: 15px; }
     .project-detail-layout { flex-direction: column; }
