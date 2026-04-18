@@ -321,6 +321,7 @@ export default function FlappyBirdWindow({ windowState, controls }) {
       onMinimize={controls.minimize}
       onMaximize={controls.maximize}
       onClose={controls.close}
+      frameStyle={windowState.isMaximized ? undefined : { height: 'auto' }}
       contentStyle={{ padding: 0, overflow: 'hidden', display: 'flex', background: '#000' }}
       preserveOnMinimize
     >

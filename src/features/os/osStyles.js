@@ -493,7 +493,7 @@ const osStyles = `
       max-height: calc(100dvh - 120px - env(safe-area-inset-bottom)) !important;
     }
     .flappy-window:not(.maximized) {
-      width: min(422px, calc(100vw - 24px)) !important;
+      width: min(422px, 100vw) !important;
     }
     .minesweeper-window:not(.maximized) {
       width: min(362px, calc(100vw - 24px)) !important;
