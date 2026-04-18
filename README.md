@@ -16,6 +16,7 @@ Visitors can:
 - Click the computer to enter a desktop-style portfolio OS
 - Open draggable windows
 - Use a built-in terminal with command
+- Launch built-in games including Flappy Bird and Minesweeper
 - Switch between multiple desktop themes
 - Toggle ambient and UI sound effects
 
@@ -35,6 +36,7 @@ Visitors can:
 - Window manager with open, focus, drag, minimize, maximize, and close behavior
 - Desktop icons, taskbar, start menu, and fullscreen media viewer
 - About, projects, games, mobile, VS Code, flower, recycle, terminal, and contact windows
+- Playable Flappy Bird and Minesweeper apps integrated directly into the desktop
 - Theme presets: `dark`, `light`, `matrix`, and `cyber`
 - Live clock and browser battery status support when available
 
@@ -67,16 +69,22 @@ Visitors can:
 
 ```text
 src/
-  components/      Shared UI building blocks
-  data/            Portfolio content and OS configuration
-  features/        Desktop OS and flower experience
+  components/
+    shared/        Shared UI building blocks
+  data/            Portfolio content, desktop icons, and project/game metadata
+  features/
+    flower/        Procedural flower renderer and controls
+    os/            Desktop OS shell, state, and interaction logic
+    os/windows/    App windows 
   hooks/           Reusable interaction and audio hooks
   lib/             Sound helpers
   pages/           Route-level pages
 public/
+  flappy/          Flappy Bird sprite and audio assets
   glb/             3D models
   images/          Project and gallery images
   logos/           Tech and app logos
+  minesweeper/     Minesweeper board and sprite assets
   sounds/          Ambient and UI audio
 demos/
   *.gif            README preview assets

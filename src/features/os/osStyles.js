@@ -242,6 +242,14 @@ const osStyles = `
     min-height: 360px;
     height: 100%;
   }
+  .flappy-window {
+    width: min(422px, calc(100vw - 24px));
+  }
+  .flappy-window-content {
+    width: 100%;
+    justify-content: center;
+    align-items: flex-start;
+  }
   .flower-window-content .app-container {
     position: relative;
     width: 100%;
@@ -398,7 +406,7 @@ const osStyles = `
 
   @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-  @media (max-width: 768px) {
+  @media (max-width: 830px) {
     .desktop {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -456,6 +464,12 @@ const osStyles = `
     .flower-window:not(.maximized) {
       height: 460px !important;
       max-height: calc(100dvh - 120px - env(safe-area-inset-bottom)) !important;
+    }
+    .flappy-window:not(.maximized) {
+      width: min(422px, calc(100vw - 24px)) !important;
+    }
+    .minesweeper-window:not(.maximized) {
+      width: min(362px, calc(100vw - 24px)) !important;
     }
     .window-content { padding: 15px; }
     .project-detail-layout { flex-direction: column; }

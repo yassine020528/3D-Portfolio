@@ -11,6 +11,8 @@ import osStyles from './features/os/osStyles';
 import Taskbar from './features/os/Taskbar';
 import AboutWindow from './features/os/windows/AboutWindow';
 import ContactWindow from './features/os/windows/ContactWindow';
+import FlappyBirdWindow from './features/os/windows/FlappyBirdWindow';
+import MinesweeperWindow from './features/os/windows/MinesweeperWindow';
 import FlowerWindow from './features/os/windows/FlowerWindow';
 import GamesWindow from './features/os/windows/GamesWindow';
 import MobileWindow from './features/os/windows/MobileWindow';
@@ -317,7 +319,10 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
         expandedGameId={expandedGameId}
         onToggleGame={(gameId) => setExpandedGameId((current) => (current === gameId ? null : gameId))}
         onOpenFigure={openFullscreenFigure}
+        onLaunchWindow={openWindow}
       />
+      <FlappyBirdWindow windowState={windows.flappyBird} controls={controlsFor('flappyBird')} />
+      <MinesweeperWindow windowState={windows.minesweeper} controls={controlsFor('minesweeper')} />
       <VscodeWindow
         windowState={windows.vscode}
         controls={controlsFor('vscode')}

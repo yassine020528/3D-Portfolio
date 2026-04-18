@@ -279,7 +279,7 @@ export default function HomePage() {
   const [isReturning, setIsReturning] = useState(false);
   const [showBio, setShowBio] = useState(false);
   const controlsRef = useRef(null);
-  const isMobile = window.innerWidth < 768;
+  const isMobile = window.innerWidth < 830;
   const { soundEnabled, toggleSound, unlockAudio } = useAmbientAudio({
     src: '/sounds/ambient.mp3',
     active: started,

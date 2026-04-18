@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Read(//c/Yassine/personal_projects/**)",
+      "Bash(cp flappy-bird-assets/sprites/*.png public/flappy/sprites/)",
+      "Bash(cp flappy-bird-assets/audio/*.wav public/flappy/audio/)"
+    ]
+  }
+}

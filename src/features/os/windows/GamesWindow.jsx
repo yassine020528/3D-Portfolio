@@ -3,14 +3,40 @@ import ExternalLinkButton from '../ExternalLinkButton';
 import FigureThumbnail from '../FigureThumbnail';
 import WindowFrame from '../WindowFrame';
 
-export default function GamesWindow({ windowState, controls, expandedGameId, onToggleGame, onOpenFigure }) {
+function LaunchGameButton({ label, onLaunch }) {
+  return (
+    <button
+      onClick={onLaunch}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '180px',
+        background: 'var(--accent-color)',
+        color: 'var(--bg-color)',
+        fontWeight: 'bold',
+        padding: '10px 14px',
+        borderRadius: '4px',
+        border: 'none',
+        cursor: 'pointer',
+        flexShrink: 0,
+        fontSize: '1rem',
+      }}
+    >
+      <span style={{ flex: 1, textAlign: 'center' }}>{label}</span>
+      <span style={{ marginLeft: '10px', fontSize: '16px', lineHeight: 1 }}>▶</span>
+    </button>
+  );
+}
+
+export default function GamesWindow({ windowState, controls, expandedGameId, onToggleGame, onOpenFigure, onLaunchWindow }) {
   return (
     <WindowFrame
       windowId="games"
       title="~/games"
       windowState={windowState}
       width="620px"
-      height="470px"
+      height="580px"
       onFocus={controls.focus}
       onStartDrag={controls.startDrag}
       onMinimize={controls.minimize}
@@ -51,17 +77,21 @@ export default function GamesWindow({ windowState, controls, expandedGameId, onT
                       <img key={`${game.title}-${index}`} src={logo} alt={`${game.title} tech ${index + 1}`} style={{ height: '24px', width: 'auto', backgroundColor: '#ffffff', padding: '2px', borderRadius: '4px' }} />
                     ))}
                   </div>
-                  {game.actionHref && <ExternalLinkButton href={game.actionHref} label={game.actionLabel} compact />}
+                  {game.actionWindowId
+                    ? <LaunchGameButton label={game.actionLabel} onLaunch={() => onLaunchWindow(game.actionWindowId)} />
+                    : game.actionHref && <ExternalLinkButton href={game.actionHref} label={game.actionLabel} compact />}
                 </div>
 
-                <FigureThumbnail
-                  src={game.figureImage}
-                  alt={game.title}
-                  caption={game.caption}
-                  figureLabel={`Figure ${game.id}`}
-                  onOpen={() => onOpenFigure(game.figureImage, game.title, `Figure ${game.id}: ${game.figureCaptionText}`)}
-                  wrapperStyle={{ flexShrink: 0 }}
-                />
+                {game.figureImage && (
+                  <FigureThumbnail
+                    src={game.figureImage}
+                    alt={game.title}
+                    caption={game.caption}
+                    figureLabel={`Figure ${game.id}`}
+                    onOpen={() => onOpenFigure(game.figureImage, game.title, `Figure ${game.id}: ${game.figureCaptionText}`)}
+                    wrapperStyle={{ flexShrink: 0 }}
+                  />
+                )}
               </div>
             </div>
           )}

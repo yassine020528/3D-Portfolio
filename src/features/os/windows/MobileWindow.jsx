@@ -8,7 +8,7 @@ export default function MobileWindow({ windowState, controls, expandedMobileId, 
       title="~/mobile"
       windowState={windowState}
       width="860px"
-      height="560px"
+      height="610px"
       onFocus={controls.focus}
       onStartDrag={controls.startDrag}
       onMinimize={controls.minimize}
