@@ -239,7 +239,7 @@ export const games = [
   {
     id: 4,
     title: 'Minesweeper',
-    tech: 'React, Canvas API',
+    tech: 'React, JavaScript, Canvas API',
     appLogo: '/images/minesweeper-logo.png',
     figureImage: '/images/minesweeper1.png',
     techLogos: ['/logos/react.svg', '/logos/javascript.svg'],
