@@ -498,7 +498,12 @@ const osStyles = `
     .minesweeper-window:not(.maximized) {
       width: min(362px, calc(100vw - 24px)) !important;
     }
-    .flappy-window.maximized .game-canvas-shell,
+    .flappy-window.maximized .game-canvas-shell {
+      --mobile-game-bottom-pad: calc(12px + env(safe-area-inset-bottom));
+      padding: 0 0 var(--mobile-game-bottom-pad) 0;
+      align-items: flex-start;
+      background: #ded895;
+    }
     .minesweeper-window.maximized .game-canvas-shell {
       padding:
         calc(12px + env(safe-area-inset-top))
