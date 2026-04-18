@@ -19,7 +19,7 @@ export default function FlowerWindow({ windowState, controls }) {
       contentStyle={{ padding: 0, overflow: 'hidden', background: '#000000' }}
       preserveOnMinimize
     >
-      <FlowerExperience />
+      <FlowerExperience isActive={!windowState.isMinimized} />
     </WindowFrame>
   );
 }

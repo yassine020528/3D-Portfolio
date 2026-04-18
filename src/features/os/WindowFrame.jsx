@@ -51,7 +51,13 @@ export default function WindowFrame({
       className={`window ${windowState.isMaximized ? 'maximized' : ''} ${className}`.trim()}
       style={{
         ...getWindowStyle(windowState, width, height, frameStyle),
-        ...(isVisuallyHidden ? { display: 'none' } : null),
+        ...(isVisuallyHidden
+          ? {
+              opacity: 0,
+              visibility: 'hidden',
+              pointerEvents: 'none',
+            }
+          : null),
       }}
       onMouseDown={onFocus}
       aria-hidden={isVisuallyHidden}

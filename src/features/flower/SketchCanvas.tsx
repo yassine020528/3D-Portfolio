@@ -7,10 +7,11 @@ interface SketchCanvasProps {
   effectMode: RenderMode;
   onReady: (ready: boolean) => void;
   hasStarted: boolean;
+  isActive: boolean;
   onLoaderFade?: () => void;
 }
 
-const SketchCanvas: React.FC<SketchCanvasProps> = ({ imageSrc, effectMode, onReady, hasStarted, onLoaderFade }) => {
+const SketchCanvas: React.FC<SketchCanvasProps> = ({ imageSrc, effectMode, onReady, hasStarted, isActive, onLoaderFade }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
   const loaderBarRef = useRef<HTMLDivElement>(null);
@@ -173,7 +174,7 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({ imageSrc, effectMode, onRea
       };
 
       p.draw = () => {
-        const dt = p.deltaTime / 1000;
+        const dt = p.min(p.deltaTime, 50) / 1000;
         const f = elements[curEl];
 
         if (loadingPhase && !customImg) {
@@ -654,6 +655,22 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({ imageSrc, effectMode, onRea
       (p5InstanceRef.current as any).setEffectMode(effectMode);
     }
   }, [effectMode]);
+
+  useEffect(() => {
+    if (!p5InstanceRef.current) {
+      return;
+    }
+
+    const instance = p5InstanceRef.current;
+
+    if (isActive) {
+      instance.resizeCanvas(containerRef.current?.clientWidth || 1, containerRef.current?.clientHeight || 1);
+      instance.loop();
+      return;
+    }
+
+    instance.noLoop();
+  }, [isActive]);
 
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%', position: 'relative' }}>

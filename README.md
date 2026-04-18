@@ -1,43 +1,139 @@
-# 🖥️ Yassine's 3D Interactive Portfolio
-> "Why build a simple portfolio when you can build a computer?"
+# Yassine's 3D Interactive Portfolio
 
-Welcome to my personal workspace, digitized. This project isn't just a gallery of my work, it's a high-performance 3D environment built with React and Three.js that puts you in the driver's seat of my creative process.
+An immersive portfolio built as a navigable 3D room with a fully interactive desktop experience inside the computer screen.
 
-Click here to see live demo: [![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://yassineabassi.com)
+Live site: [yassineabassi.com](https://yassineabassi.com)
 
-## 🌟 The Experience
-✔️Immersive 3D Room: A custom-designed workspace featuring realistic lighting, shadows, and smooth camera rigging.
+![3D room demo](./demos/3d_demo.gif)
 
-✔️Functional Virtual OS: Click on the computer screen to enter a fully interactive web-based operating system.
+## Overview
 
-✔️Retro Terminal: A functional bash-style terminal supporting commands like help, about, and projects.
+This project combines a real-time 3D scene with a browser-based operating system to turn a personal portfolio into something playful and explorable.
 
-✔️Dynamic Themes: Toggle between Dark, Light, Hacker, and Cyberpunk modes within the virtual settings.
+Visitors can:
 
-## 🛠️ Tech Stack
-### Core
-React.js: For component-based UI and state management.
+- Orbit around a stylized 3D room
+- Click the computer to enter a desktop-style portfolio OS
+- Open draggable windows
+- Use a built-in terminal with command
+- Switch between multiple desktop themes
+- Toggle ambient and UI sound effects
 
-Three.js / React-Three-Fiber: Powering the 3D engine and scene rendering.
+![OS demo](./demos/os_demo.gif)
 
-Drei: To simplify 3D helpers like OrbitControls and GLTF loading.
+## Features
 
-![3d_demo](./demos/3d_demo.gif)
+### 3D Scene
 
-### The "OS" Logic
-Tailwind / CSS-in-JS: For the retro window management and CRT screen effects.
+- Built with React Three Fiber, Drei, and Three.js
+- Interactive camera movement with room and screen-focused views
+- Custom lighting, shadows, and GLB models
+- Clickable 3D avatar and computer screen interactions
 
-EmailJS: Handling real-time contact form submissions directly from the virtual desktop.
+### Portfolio OS
 
-![os_demo](./demos/os_demo.gif)
-## 🚀 Quick Start
-Want to see how the "under the hood" logic works?
+- Window manager with open, focus, drag, minimize, maximize, and close behavior
+- Desktop icons, taskbar, start menu, and fullscreen media viewer
+- About, projects, games, mobile, VS Code, flower, recycle, terminal, and contact windows
+- Theme presets: `dark`, `light`, `matrix`, and `cyber`
+- Live clock and browser battery status support when available
 
-Clone the repo:
-`git clone https://github.com/Yassine020528/3D-Portfolio.git`
+### Media and Interaction
 
-Install dependencies:
-`npm install`
+- Ambient audio and interface sound effects
+- Contact form powered by EmailJS
+- Resume PDF and project/media assets served from `public/`
 
-Run locally:
-`npm run dev`
+### Flower System
+
+- Built with `p5.js` embedded in React for a custom procedural art experience
+- Uses an offscreen graphics buffer and post-process style remapping into `ASCII`, `DOTS`, and `PIXEL` render modes
+- Supports uploaded images that can be transformed through the same visual pipeline
+- Combines easing functions, trigonometry, manual 3D rotation, and perspective scaling to animate bloom, rotation, and wilting
+- Shapes petals, leaves, and sepals mathematically with layered polar placement, sine-based deformation, and Bezier curves
+
+## Tech Stack
+
+- React 18
+- Vite
+- React Router
+- Three.js
+- @react-three/fiber
+- @react-three/drei
+- EmailJS
+- p5.js
+
+## Project Structure
+
+```text
+src/
+  components/      Shared UI building blocks
+  data/            Portfolio content and OS configuration
+  features/        Desktop OS and flower experience
+  hooks/           Reusable interaction and audio hooks
+  lib/             Sound helpers
+  pages/           Route-level pages
+public/
+  glb/             3D models
+  images/          Project and gallery images
+  logos/           Tech and app logos
+  sounds/          Ambient and UI audio
+demos/
+  *.gif            README preview assets
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ recommended
+- npm
+
+### Install
+
+```bash
+npm install
+```
+
+### Run the development server
+
+```bash
+npm run dev
+```
+
+### Build for production
+
+```bash
+npm run build
+```
+
+### Preview the production build
+
+```bash
+npm run preview
+```
+
+## Available Scripts
+
+- `npm run dev` starts the Vite development server
+- `npm run build` creates a production build in `dist/`
+- `npm run preview` serves the production build locally
+- `npm run lint` runs ESLint
+
+## Notes
+
+- The project includes a Netlify-style `public/_redirects` file for SPA routing support on static hosting.
+- Some interactive features depend on browser capabilities such as audio autoplay permissions and the Battery Status API.
+
+## Flower Math and Rendering
+
+The flower experience in `src/features/flower/` is one of the most custom parts of the project. It uses `p5.js` for the drawing loop and procedural geometry, while React manages UI state, audio, renderer selection, and uploaded images.
+
+Core ideas used in the flower renderer:
+
+- Easing functions such as `easeInOutCubic` and `easeOutQuart` control bloom timing, stem growth, and transition pacing.
+- Trigonometric formulas based on `sin` and `cos` drive petal placement, ruffle motion, stem curvature, and subtle idle rotation.
+- Manual 3D rotation is applied with custom X/Y/Z rotation math before projecting shapes onto the 2D canvas.
+- Perspective scaling uses formulas like `focal / (focal + z)` so depth changes the apparent size of petals and inner flower structures.
+- Petals are generated in layers using radial placement around `2 * PI`, then shaped with width envelopes such as `sin(t * PI)` and phase-shifted ripple terms.
+- Leaves and sepals are drawn with Bezier curves for more organic silhouettes instead of relying on image assets.

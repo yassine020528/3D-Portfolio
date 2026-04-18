@@ -103,21 +103,139 @@ function RoomModel({ onComputerClick }) {
 }
 
 function RoomShell() {
-  const wallMaterial = <meshStandardMaterial color="#ad9d9d" />;
-  const wallGeometry = <planeGeometry args={[1500, 500]} />;
-
   return (
     <>
       <group>
-        <mesh position={[0, 250, -400]} receiveShadow>{wallGeometry}{wallMaterial}</mesh>
-        <mesh position={[-500, 250, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>{wallGeometry}{wallMaterial}</mesh>
-        <mesh position={[500, 250, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>{wallGeometry}{wallMaterial}</mesh>
-        <mesh position={[0, 250, 400]} rotation={[0, Math.PI, 0]} receiveShadow>{wallGeometry}{wallMaterial}</mesh>
+        <mesh position={[0, 250, -406]} receiveShadow castShadow>
+          <boxGeometry args={[1000, 500, 12]} />
+          <meshPhysicalMaterial
+            color="#d9d0c7"
+            roughness={0.84}
+            metalness={0.02}
+            clearcoat={0.08}
+          />
+        </mesh>
+        <mesh position={[-506, 250, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow castShadow>
+          <boxGeometry args={[812, 500, 12]} />
+          <meshPhysicalMaterial
+            color="#d4cbc2"
+            roughness={0.88}
+            metalness={0.01}
+            clearcoat={0.05}
+          />
+        </mesh>
+        <mesh position={[506, 250, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow castShadow>
+          <boxGeometry args={[812, 500, 12]} />
+          <meshPhysicalMaterial
+            color="#d4cbc2"
+            roughness={0.88}
+            metalness={0.01}
+            clearcoat={0.05}
+          />
+        </mesh>
+        <mesh position={[0, 250, 406]} rotation={[0, Math.PI, 0]} receiveShadow castShadow>
+          <boxGeometry args={[1000, 500, 12]} />
+          <meshPhysicalMaterial
+            color="#c3b4aa"
+            roughness={0.74}
+            metalness={0.03}
+            clearcoat={0.12}
+          />
+        </mesh>
+        <mesh position={[250, 118, 397]} receiveShadow castShadow>
+          <boxGeometry args={[164, 246, 6]} />
+          <meshStandardMaterial color="#9c887b" roughness={0.6} />
+        </mesh>
+        <mesh position={[250, 120, 392]} receiveShadow castShadow>
+          <boxGeometry args={[140, 226, 8]} />
+          <meshPhysicalMaterial
+            color="#6d4f3d"
+            roughness={0.5}
+            metalness={0.06}
+            clearcoat={0.28}
+            clearcoatRoughness={0.5}
+          />
+        </mesh>
+        <mesh position={[250, 120, 386]} receiveShadow castShadow>
+          <boxGeometry args={[96, 174, 2]} />
+          <meshStandardMaterial
+            color="#7e5d49"
+            roughness={0.68}
+            polygonOffset
+            polygonOffsetFactor={-1}
+            polygonOffsetUnits={-1}
+          />
+        </mesh>
+        <mesh position={[300, 108, 387]} receiveShadow castShadow>
+          <cylinderGeometry args={[5, 5, 6, 24]} />
+          <meshStandardMaterial color="#c9b28d" metalness={0.7} roughness={0.28} />
+        </mesh>
+
+        <mesh position={[0, 250, -398]} receiveShadow castShadow>
+          <boxGeometry args={[820, 360, 4]} />
+          <meshPhysicalMaterial
+            color="#eee5db"
+            roughness={0.72}
+            metalness={0.02}
+            clearcoat={0.14}
+          />
+        </mesh>
+        <mesh position={[-220, 250, -395]} receiveShadow castShadow>
+          <boxGeometry args={[14, 360, 8]} />
+          <meshStandardMaterial color="#bfae9f" roughness={0.55} />
+        </mesh>
+        <mesh position={[0, 250, -395]} receiveShadow castShadow>
+          <boxGeometry args={[14, 360, 8]} />
+          <meshStandardMaterial color="#bfae9f" roughness={0.55} />
+        </mesh>
+        <mesh position={[220, 250, -395]} receiveShadow castShadow>
+          <boxGeometry args={[14, 360, 8]} />
+          <meshStandardMaterial color="#bfae9f" roughness={0.55} />
+        </mesh>
+
+        <mesh position={[0, -10, 0]} receiveShadow>
+          <boxGeometry args={[1120, 20, 920]} />
+          <meshStandardMaterial color="#655345" roughness={0.92} />
+        </mesh>
+        <mesh position={[0, -2, 0]} receiveShadow>
+          <boxGeometry args={[1080, 4, 880]} />
+          <meshPhysicalMaterial
+            color="#7c614e"
+            roughness={0.46}
+            metalness={0.02}
+            clearcoat={0.38}
+            clearcoatRoughness={0.58}
+            polygonOffset
+            polygonOffsetFactor={-1}
+            polygonOffsetUnits={-1}
+          />
+        </mesh>
+
+        <mesh position={[0, 12, -392]} receiveShadow castShadow>
+          <boxGeometry args={[1000, 24, 12]} />
+          <meshStandardMaterial color="#a69384" roughness={0.62} />
+        </mesh>
+        <mesh position={[0, 488, -392]} receiveShadow castShadow>
+          <boxGeometry args={[1000, 18, 8]} />
+          <meshStandardMaterial color="#b9ab9f" roughness={0.58} />
+        </mesh>
+        <mesh position={[-492, 12, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow castShadow>
+          <boxGeometry args={[812, 24, 8]} />
+          <meshStandardMaterial color="#a69384" roughness={0.62} />
+        </mesh>
+        <mesh position={[492, 12, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow castShadow>
+          <boxGeometry args={[812, 24, 8]} />
+          <meshStandardMaterial color="#a69384" roughness={0.62} />
+        </mesh>
+        <mesh position={[-168, 12, 392]} receiveShadow castShadow>
+          <boxGeometry args={[664, 24, 8]} />
+          <meshStandardMaterial color="#9e8a7e" roughness={0.6} />
+        </mesh>
+        <mesh position={[418, 12, 392]} receiveShadow castShadow>
+          <boxGeometry args={[164, 24, 8]} />
+          <meshStandardMaterial color="#9e8a7e" roughness={0.6} />
+        </mesh>
       </group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[2000, 2000]} />
-        <shadowMaterial opacity={0.5} />
-      </mesh>
     </>
   );
 }

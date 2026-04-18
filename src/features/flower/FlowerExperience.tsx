@@ -3,7 +3,11 @@ import SketchCanvas from './SketchCanvas';
 import { playClickSound } from '../../lib/sound';
 import { RenderMode } from './types';
 
-function FlowerExperience() {
+interface FlowerExperienceProps {
+  isActive?: boolean;
+}
+
+function FlowerExperience({ isActive = true }: FlowerExperienceProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [effectMode, setEffectMode] = useState<RenderMode>(0);
   const [isReady, setIsReady] = useState(false);
@@ -71,6 +75,17 @@ function FlowerExperience() {
     event.target.value = '';
   };
 
+  const resetFlower = (event?: { stopPropagation?: () => void }) => {
+    event?.stopPropagation?.();
+    playClickSound();
+
+    if (imageSrc) {
+      URL.revokeObjectURL(imageSrc);
+    }
+
+    setImageSrc(null);
+  };
+
   const openFilePicker = (event?: { stopPropagation?: () => void }) => {
     event?.stopPropagation?.();
     playClickSound();
@@ -116,6 +131,14 @@ function FlowerExperience() {
         }}>
           Upload Photo
         </div>
+        <div className="text-btn" role="button" tabIndex={0} onClick={resetFlower} onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            resetFlower(event);
+          }
+        }}>
+          Reset
+        </div>
         <div className="text-btn" role="button" tabIndex={0} onClick={(event) => {
           event.stopPropagation();
           playClickSound();
@@ -141,6 +164,7 @@ function FlowerExperience() {
         effectMode={effectMode}
         onReady={setIsReady}
         hasStarted={hasStarted}
+        isActive={isActive}
         onLoaderFade={() => {
           if (!hasStarted) {
             setShowEnterPrompt(true);
