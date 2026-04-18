@@ -248,7 +248,34 @@ const osStyles = `
   .flappy-window-content {
     width: 100%;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
+  }
+  .minesweeper-window-content {
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+  .game-canvas-shell {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    min-width: 0;
+  }
+  .game-canvas {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  .flappy-canvas-shell {
+    background: #4ec0ca;
+  }
+  .minesweeper-canvas-shell {
+    background: #bdbdbd;
   }
   .flower-window-content .app-container {
     position: relative;
@@ -471,6 +498,21 @@ const osStyles = `
     .minesweeper-window:not(.maximized) {
       width: min(362px, calc(100vw - 24px)) !important;
     }
+    .flappy-window.maximized .game-canvas-shell,
+    .minesweeper-window.maximized .game-canvas-shell {
+      padding:
+        calc(12px + env(safe-area-inset-top))
+        0
+        calc(12px + env(safe-area-inset-bottom))
+        0;
+    }
+    .flappy-window.maximized .game-canvas,
+    .minesweeper-window.maximized .game-canvas {
+      width: 100%;
+      height: auto;
+      max-width: none;
+      max-height: 100%;
+    }
     .window-content { padding: 15px; }
     .project-detail-layout { flex-direction: column; }
     .project-image-container { margin-bottom: 15px; }
@@ -505,6 +547,20 @@ const osStyles = `
     .mobile-app-card { flex-wrap: wrap; }
     .mobile-app-content { min-width: 100%; }
     .mobile-app-shots { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+  }
+
+  @media (min-width: 831px) {
+    .flappy-window.maximized .game-canvas-shell,
+    .minesweeper-window.maximized .game-canvas-shell {
+      padding: 0 clamp(20px, 4vw, 48px);
+    }
+    .flappy-window.maximized .game-canvas,
+    .minesweeper-window.maximized .game-canvas {
+      width: auto;
+      height: 100%;
+      max-width: 100%;
+      max-height: none;
+    }
   }
 `;
 

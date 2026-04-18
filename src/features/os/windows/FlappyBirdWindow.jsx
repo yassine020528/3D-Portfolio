@@ -324,13 +324,16 @@ export default function FlappyBirdWindow({ windowState, controls }) {
       contentStyle={{ padding: 0, overflow: 'hidden', display: 'flex', background: '#000' }}
       preserveOnMinimize
     >
-      <canvas
-        ref={canvasRef}
-        width={W}
-        height={H}
-        onClick={flap}
-        style={{ display: 'block', width: '100%', height: 'auto', cursor: 'pointer' }}
-      />
+      <div className="game-canvas-shell flappy-canvas-shell">
+        <canvas
+          ref={canvasRef}
+          width={W}
+          height={H}
+          onClick={flap}
+          className="game-canvas flappy-canvas"
+          style={{ cursor: 'pointer' }}
+        />
+      </div>
     </WindowFrame>
   );
 }

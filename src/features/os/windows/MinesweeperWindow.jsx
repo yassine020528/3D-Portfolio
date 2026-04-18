@@ -338,6 +338,7 @@ export default function MinesweeperWindow({ windowState, controls }) {
       title="minesweeper.exe"
       windowState={windowState}
       className="minesweeper-window"
+      contentClassName="minesweeper-window-content"
       width={`${CW + 2}px`}
       height={`${CH + 40}px`}
       onFocus={controls.focus}
@@ -348,14 +349,17 @@ export default function MinesweeperWindow({ windowState, controls }) {
       contentStyle={{ padding: 0, overflow: 'hidden', display: 'flex', justifyContent: 'center', background: '#bdbdbd' }}
       preserveOnMinimize
     >
-      <canvas
-        ref={canvasRef}
-        width={CW}
-        height={CH}
-        onClick={handleClick}
-        onContextMenu={handleRightClick}
-        style={{ display: 'block', cursor: 'default' }}
-      />
+      <div className="game-canvas-shell minesweeper-canvas-shell">
+        <canvas
+          ref={canvasRef}
+          width={CW}
+          height={CH}
+          onClick={handleClick}
+          onContextMenu={handleRightClick}
+          className="game-canvas minesweeper-canvas"
+          style={{ cursor: 'default' }}
+        />
+      </div>
     </WindowFrame>
   );
 }
