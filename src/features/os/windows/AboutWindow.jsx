@@ -23,7 +23,7 @@ export default function AboutWindow({ windowState, controls, onOpenFigure }) {
       <hr style={{ borderColor: 'var(--border-color)' }} />
       <p>
         I've been fascinated by how things work "under the hood" ever since I dismantled my first remote control car as a child.
-        Back then, adults would called it "destruction", but I prefer the term curiosity.
+        Back then, adults would have called it "destruction", but I prefer the term curiosity.
         <br />
         There was something addictive about seeing the raw circuit boards and gears that made the magic happen.
         Eventually, I learned that putting things back together was just as fun as taking them apart.
