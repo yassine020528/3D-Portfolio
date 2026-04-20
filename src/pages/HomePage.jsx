@@ -13,16 +13,21 @@ import StatusOverlay from '../components/shared/StatusOverlay';
 import useAmbientAudio from '../hooks/useAmbientAudio';
 import { playClickSound, playPowerToggleSound } from '../lib/sound';
 
+const ROOM_CAMERA_POSITION = [0, 150, 380];
+const ROOM_CAMERA_TARGET = [15, 80, 0];
+
 function CameraRig({ view, controlsRef, setIsReturning, isReturning }) {
   useFrame((state, delta) => {
+    const d = Math.min(delta, 0.05);
+
     if (view === 'screen') {
       const targetPosition = new THREE.Vector3(-5, 95, 75);
       const targetLook = new THREE.Vector3(-5, 95, 0);
 
-      state.camera.position.lerp(targetPosition, 4 * delta);
+      state.camera.position.lerp(targetPosition, 4 * d);
 
       if (controlsRef.current) {
-        controlsRef.current.target.lerp(targetLook, 4 * delta);
+        controlsRef.current.target.lerp(targetLook, 4 * d);
         controlsRef.current.update();
       }
 
@@ -30,13 +35,13 @@ function CameraRig({ view, controlsRef, setIsReturning, isReturning }) {
     }
 
     if (isReturning) {
-      const targetPosition = new THREE.Vector3(-30, 200, 300);
-      const targetLook = new THREE.Vector3(50, 35, 0);
+      const targetPosition = new THREE.Vector3(...ROOM_CAMERA_POSITION);
+      const targetLook = new THREE.Vector3(...ROOM_CAMERA_TARGET);
 
-      state.camera.position.lerp(targetPosition, 3 * delta);
+      state.camera.position.lerp(targetPosition, 3 * d);
 
       if (controlsRef.current) {
-        controlsRef.current.target.lerp(targetLook, 3 * delta);
+        controlsRef.current.target.lerp(targetLook, 3 * d);
         controlsRef.current.update();
       }
 
@@ -278,7 +283,9 @@ export default function HomePage() {
   const [view, setView] = useState('room');
   const [isReturning, setIsReturning] = useState(false);
   const [showBio, setShowBio] = useState(false);
+  const [canvasFrameloop, setCanvasFrameloop] = useState('always');
   const controlsRef = useRef(null);
+  const previousViewRef = useRef('room');
   const isMobile = window.innerWidth < 830;
   const { soundEnabled, toggleSound, unlockAudio } = useAmbientAudio({
     src: '/sounds/ambient.mp3',
@@ -287,10 +294,21 @@ export default function HomePage() {
   });
 
   useEffect(() => {
-    if (started && view === 'room') {
+    if (started && previousViewRef.current === 'screen' && view === 'room') {
       setIsReturning(true);
     }
+
+    previousViewRef.current = view;
   }, [started, view]);
+
+  useEffect(() => {
+    if (view === 'screen') {
+      // Let the camera fly-in animation finish (~1.5s), then pause 3D rendering
+      const timer = setTimeout(() => setCanvasFrameloop('never'), 1500);
+      return () => clearTimeout(timer);
+    }
+    setCanvasFrameloop('always');
+  }, [view]);
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
@@ -310,7 +328,7 @@ export default function HomePage() {
         />
       )}
 
-      <Canvas shadows camera={{ position: isMobile ? [0, 250, 500] : [0, 200, 300], fov: isMobile ? 90 : 45 }}>
+      <Canvas shadows frameloop={canvasFrameloop} camera={{ position: isMobile ? [0, 250, 500] : ROOM_CAMERA_POSITION, fov: isMobile ? 90 : 45 }}>
         <DynamicBackground />
         <CameraRig
           view={view}
@@ -370,6 +388,7 @@ export default function HomePage() {
 
         <OrbitControls
           ref={controlsRef}
+          target={ROOM_CAMERA_TARGET}
           enableZoom
           enablePan
           panSpeed={1}

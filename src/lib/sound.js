@@ -1,27 +1,27 @@
-const createAudio = (src, volume = 1) => {
+const preload = (src, volume = 1) => {
   const audio = new Audio(src);
   audio.volume = volume;
   return audio;
 };
 
-const playAudio = (src, volume = 1) => {
-  createAudio(src, volume).play().catch((error) => console.error(error));
+const replay = (audio) => {
+  audio.currentTime = 0;
+  audio.play().catch(() => {});
 };
 
-const KEYBOARD_SOUNDS = [
+const clickAudio = preload('/sounds/click.mp3');
+const powerAudio = preload('/sounds/on-off-sound.mp3', 0.5);
+const keyboardAudios = [
   '/sounds/keyboard/key_1.mp3',
   '/sounds/keyboard/key_2.mp3',
   '/sounds/keyboard/key_3.mp3',
   '/sounds/keyboard/key_4.mp3',
   '/sounds/keyboard/key_5.mp3',
   '/sounds/keyboard/key_6.mp3',
-];
+].map((src) => preload(src));
 
-export const playClickSound = () => playAudio('/sounds/click.mp3');
-
-export const playPowerToggleSound = () => playAudio('/sounds/on-off-sound.mp3', 0.5);
-
+export const playClickSound = () => replay(clickAudio);
+export const playPowerToggleSound = () => replay(powerAudio);
 export const playKeyboardSound = () => {
-  const randomIndex = Math.floor(Math.random() * KEYBOARD_SOUNDS.length);
-  playAudio(KEYBOARD_SOUNDS[randomIndex]);
+  replay(keyboardAudios[Math.floor(Math.random() * keyboardAudios.length)]);
 };

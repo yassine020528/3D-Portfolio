@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import emailjs from '@emailjs/browser';
 
 import { codeFiles, desktopIcons, initialWindows, themeVars } from './data/osData';
@@ -11,9 +11,6 @@ import osStyles from './features/os/osStyles';
 import Taskbar from './features/os/Taskbar';
 import AboutWindow from './features/os/windows/AboutWindow';
 import ContactWindow from './features/os/windows/ContactWindow';
-import FlappyBirdWindow from './features/os/windows/FlappyBirdWindow';
-import MinesweeperWindow from './features/os/windows/MinesweeperWindow';
-import FlowerWindow from './features/os/windows/FlowerWindow';
 import GamesWindow from './features/os/windows/GamesWindow';
 import MobileWindow from './features/os/windows/MobileWindow';
 import ProjectsWindow from './features/os/windows/ProjectsWindow';
@@ -21,6 +18,10 @@ import RecycleWindow from './features/os/windows/RecycleWindow';
 import SettingsWindow from './features/os/windows/SettingsWindow';
 import TerminalWindow from './features/os/windows/TerminalWindow';
 import VscodeWindow from './features/os/windows/VscodeWindow';
+
+const FlappyBirdWindow = lazy(() => import('./features/os/windows/FlappyBirdWindow'));
+const FlowerWindow = lazy(() => import('./features/os/windows/FlowerWindow'));
+const MinesweeperWindow = lazy(() => import('./features/os/windows/MinesweeperWindow'));
 
 function useBatteryStatus() {
   const [battery, setBattery] = useState(null);
@@ -321,8 +322,16 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
         onOpenFigure={openFullscreenFigure}
         onLaunchWindow={openWindow}
       />
-      <FlappyBirdWindow windowState={windows.flappyBird} controls={controlsFor('flappyBird')} />
-      <MinesweeperWindow windowState={windows.minesweeper} controls={controlsFor('minesweeper')} />
+      {windows.flappyBird.isOpen && (
+        <Suspense fallback={null}>
+          <FlappyBirdWindow windowState={windows.flappyBird} controls={controlsFor('flappyBird')} />
+        </Suspense>
+      )}
+      {windows.minesweeper.isOpen && (
+        <Suspense fallback={null}>
+          <MinesweeperWindow windowState={windows.minesweeper} controls={controlsFor('minesweeper')} />
+        </Suspense>
+      )}
       <VscodeWindow
         windowState={windows.vscode}
         controls={controlsFor('vscode')}
@@ -332,7 +341,11 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
         activeCodePanel={activeCodePanel}
         setActiveCodePanel={setActiveCodePanel}
       />
-      <FlowerWindow windowState={windows.flower} controls={controlsFor('flower')} />
+      {windows.flower.isOpen && (
+        <Suspense fallback={null}>
+          <FlowerWindow windowState={windows.flower} controls={controlsFor('flower')} />
+        </Suspense>
+      )}
       <RecycleWindow windowState={windows.recycle} controls={controlsFor('recycle')} />
       <TerminalWindow
         windowState={windows.terminal}
