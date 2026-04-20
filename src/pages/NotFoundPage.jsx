@@ -1,15 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 
 import StatusOverlay from '../components/shared/StatusOverlay';
-import useAmbientAudio from '../hooks/useAmbientAudio';
 import { playClickSound } from '../lib/sound';
 
 export default function NotFoundPage() {
   const navigate = useNavigate();
-  const { soundEnabled, toggleSound } = useAmbientAudio({
-    src: '/sounds/hold-music.mp3',
-    active: true,
-  });
 
   return (
     <div
@@ -29,7 +24,7 @@ export default function NotFoundPage() {
         fontFamily: 'monospace',
       }}
     >
-      <StatusOverlay visible soundEnabled={soundEnabled} toggleSound={toggleSound} />
+      <StatusOverlay visible />
       <h1 style={{ color: 'white', fontFamily: 'monospace', marginTop: '150px' }}>
         SYSTEM ERROR: PAGE_NOT_FOUND
       </h1>

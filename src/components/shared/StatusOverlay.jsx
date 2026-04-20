@@ -1,11 +1,8 @@
 import useClock from '../../hooks/useClock';
-import SoundToggleButton from './SoundToggleButton';
 
 export default function StatusOverlay({
   visible,
   subtitle = 'Computer Engineering Student',
-  soundEnabled,
-  toggleSound,
 }) {
   const time = useClock();
 
@@ -37,15 +34,6 @@ export default function StatusOverlay({
       <div style={boxStyle}>{subtitle}</div>
       <div style={{ display: 'flex', gap: '10px', pointerEvents: 'auto' }}>
         <div style={boxStyle}>{time}</div>
-        <SoundToggleButton
-          enabled={soundEnabled}
-          onToggle={toggleSound}
-          title={soundEnabled ? 'Mute ambient audio' : 'Unmute ambient audio'}
-          style={{
-            ...boxStyle,
-            minWidth: '40px',
-          }}
-        />
       </div>
     </div>
   );

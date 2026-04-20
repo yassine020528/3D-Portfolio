@@ -1,28 +1,46 @@
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-import Bio from '../Bio';
-import ComputerModel from '../ComputerModel';
 import ComputerOS from '../ComputerOS';
+import Bio from '../Bio';
+import Cat from '../3d-cat';
+import Room from '../Room';
 import Yassine from '../Yassine';
 import LoadingScreen from '../components/shared/LoadingScreen';
 import OccludedHtml from '../components/shared/OccludedHtml';
 import StatusOverlay from '../components/shared/StatusOverlay';
-import useAmbientAudio from '../hooks/useAmbientAudio';
 import { playClickSound, playPowerToggleSound } from '../lib/sound';
 
-const ROOM_CAMERA_POSITION = [0, 150, 380];
-const ROOM_CAMERA_TARGET = [15, 80, 0];
+const ROOM_CAMERA_POSITION = [60, 80, -60];
 
-function CameraRig({ view, controlsRef, setIsReturning, isReturning }) {
+const MOBILE_ROOM_CAMERA_POSITION = [-20, 70, -10];
+const ROOM_CAMERA_TARGET = [-50, 50, 50];
+const SCREEN_CAMERA_POSITION = [-50, 30, 90];
+const SCREEN_CAMERA_TARGET = [-50, 50, 100];
+const LEFT_ROTATION_LIMIT_POSITION = [-100, 70, -271];
+const RIGHT_ROTATION_LIMIT_POSITION = [205, 8, 120];
+const FLOOR_SURFACE_NAME = 'Cube005_Material003_0';
+const FLOOR_BASE_NAME = 'Cube006_Material013_0';
+const FLOOR_SURFACE_LIFT = 0.12;
+const HIDDEN_MESH_NAMES = new Set(['Plane001_Material042_0']);
+const CAT_BANNER_DURATION_MS = 2000;
+
+function getAzimuthAngleFromPosition(position, target) {
+  return Math.atan2(position[0] - target[0], position[2] - target[2]);
+}
+
+const MIN_AZIMUTH_ANGLE = getAzimuthAngleFromPosition(RIGHT_ROTATION_LIMIT_POSITION, ROOM_CAMERA_TARGET);
+const MAX_AZIMUTH_ANGLE = getAzimuthAngleFromPosition(LEFT_ROTATION_LIMIT_POSITION, ROOM_CAMERA_TARGET) + Math.PI * 2;
+
+function CameraRig({ view, controlsRef, setIsReturning, isReturning, roomCameraPosition }) {
   useFrame((state, delta) => {
     const d = Math.min(delta, 0.05);
 
     if (view === 'screen') {
-      const targetPosition = new THREE.Vector3(-5, 95, 75);
-      const targetLook = new THREE.Vector3(-5, 95, 0);
+      const targetPosition = new THREE.Vector3(...SCREEN_CAMERA_POSITION);
+      const targetLook = new THREE.Vector3(...SCREEN_CAMERA_TARGET);
 
       state.camera.position.lerp(targetPosition, 4 * d);
 
@@ -35,7 +53,7 @@ function CameraRig({ view, controlsRef, setIsReturning, isReturning }) {
     }
 
     if (isReturning) {
-      const targetPosition = new THREE.Vector3(...ROOM_CAMERA_POSITION);
+      const targetPosition = new THREE.Vector3(...roomCameraPosition);
       const targetLook = new THREE.Vector3(...ROOM_CAMERA_TARGET);
 
       state.camera.position.lerp(targetPosition, 3 * d);
@@ -51,18 +69,24 @@ function CameraRig({ view, controlsRef, setIsReturning, isReturning }) {
 
       return;
     }
+  });
+
+  return null;
+}
+
+function InitialCameraPose({ controlsRef, position }) {
+  const { camera } = useThree();
+
+  useLayoutEffect(() => {
+    camera.position.set(...position);
+    camera.lookAt(...ROOM_CAMERA_TARGET);
+    camera.updateProjectionMatrix();
 
     if (controlsRef.current) {
-      const target = controlsRef.current.target;
-      const minPan = new THREE.Vector3(-150, 0, -100);
-      const maxPan = new THREE.Vector3(150, 150, 100);
-
-      target.x = THREE.MathUtils.clamp(target.x, minPan.x, maxPan.x);
-      target.y = THREE.MathUtils.clamp(target.y, minPan.y, maxPan.y);
-      target.z = THREE.MathUtils.clamp(target.z, minPan.z, maxPan.z);
+      controlsRef.current.target.set(...ROOM_CAMERA_TARGET);
       controlsRef.current.update();
     }
-  });
+  }, [camera, controlsRef, position]);
 
   return null;
 }
@@ -92,156 +116,71 @@ function DynamicBackground() {
   return null;
 }
 
-function RoomModel({ onComputerClick }) {
-  const { scene } = useThree();
+function RoomModel({ onCatClick, onAvatarClick, onComputerClick }) {
+  const roomRef = useRef(null);
 
   useEffect(() => {
-    scene.traverse((child) => {
+    if (!roomRef.current) {
+      return;
+    }
+
+    roomRef.current.traverse((child) => {
       if (child.isMesh) {
+        if (HIDDEN_MESH_NAMES.has(child.name)) {
+          child.visible = false;
+          return;
+        }
+
         child.castShadow = true;
         child.receiveShadow = true;
+
+        if (child.name === FLOOR_SURFACE_NAME) {
+          child.position.y += FLOOR_SURFACE_LIFT;
+          child.castShadow = false;
+          child.receiveShadow = false;
+        }
+
+        if (child.name === FLOOR_BASE_NAME) {
+          child.castShadow = false;
+          child.receiveShadow = false;
+        }
       }
     });
-  }, [scene]);
+  }, []);
 
-  return <ComputerModel onScreenClick={onComputerClick} />;
-}
-
-function RoomShell() {
   return (
-    <>
-      <group>
-        <mesh position={[0, 250, -406]} receiveShadow castShadow>
-          <boxGeometry args={[1000, 500, 12]} />
-          <meshPhysicalMaterial
-            color="#d9d0c7"
-            roughness={0.84}
-            metalness={0.02}
-            clearcoat={0.08}
-          />
-        </mesh>
-        <mesh position={[-506, 250, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow castShadow>
-          <boxGeometry args={[812, 500, 12]} />
-          <meshPhysicalMaterial
-            color="#d4cbc2"
-            roughness={0.88}
-            metalness={0.01}
-            clearcoat={0.05}
-          />
-        </mesh>
-        <mesh position={[506, 250, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow castShadow>
-          <boxGeometry args={[812, 500, 12]} />
-          <meshPhysicalMaterial
-            color="#d4cbc2"
-            roughness={0.88}
-            metalness={0.01}
-            clearcoat={0.05}
-          />
-        </mesh>
-        <mesh position={[0, 250, 406]} rotation={[0, Math.PI, 0]} receiveShadow castShadow>
-          <boxGeometry args={[1000, 500, 12]} />
-          <meshPhysicalMaterial
-            color="#c3b4aa"
-            roughness={0.74}
-            metalness={0.03}
-            clearcoat={0.12}
-          />
-        </mesh>
-        <mesh position={[250, 118, 397]} receiveShadow castShadow>
-          <boxGeometry args={[164, 246, 6]} />
-          <meshStandardMaterial color="#9c887b" roughness={0.6} />
-        </mesh>
-        <mesh position={[250, 120, 392]} receiveShadow castShadow>
-          <boxGeometry args={[140, 226, 8]} />
-          <meshPhysicalMaterial
-            color="#6d4f3d"
-            roughness={0.5}
-            metalness={0.06}
-            clearcoat={0.28}
-            clearcoatRoughness={0.5}
-          />
-        </mesh>
-        <mesh position={[250, 120, 386]} receiveShadow castShadow>
-          <boxGeometry args={[96, 174, 2]} />
-          <meshStandardMaterial
-            color="#7e5d49"
-            roughness={0.68}
-            polygonOffset
-            polygonOffsetFactor={-1}
-            polygonOffsetUnits={-1}
-          />
-        </mesh>
-        <mesh position={[300, 108, 387]} receiveShadow castShadow>
-          <cylinderGeometry args={[5, 5, 6, 24]} />
-          <meshStandardMaterial color="#c9b28d" metalness={0.7} roughness={0.28} />
-        </mesh>
-
-        <mesh position={[0, 250, -398]} receiveShadow castShadow>
-          <boxGeometry args={[820, 360, 4]} />
-          <meshPhysicalMaterial
-            color="#eee5db"
-            roughness={0.72}
-            metalness={0.02}
-            clearcoat={0.14}
-          />
-        </mesh>
-        <mesh position={[-220, 250, -395]} receiveShadow castShadow>
-          <boxGeometry args={[14, 360, 8]} />
-          <meshStandardMaterial color="#bfae9f" roughness={0.55} />
-        </mesh>
-        <mesh position={[0, 250, -395]} receiveShadow castShadow>
-          <boxGeometry args={[14, 360, 8]} />
-          <meshStandardMaterial color="#bfae9f" roughness={0.55} />
-        </mesh>
-        <mesh position={[220, 250, -395]} receiveShadow castShadow>
-          <boxGeometry args={[14, 360, 8]} />
-          <meshStandardMaterial color="#bfae9f" roughness={0.55} />
-        </mesh>
-
-        <mesh position={[0, -10, 0]} receiveShadow>
-          <boxGeometry args={[1120, 20, 920]} />
-          <meshStandardMaterial color="#655345" roughness={0.92} />
-        </mesh>
-        <mesh position={[0, -2, 0]} receiveShadow>
-          <boxGeometry args={[1080, 4, 880]} />
-          <meshPhysicalMaterial
-            color="#7c614e"
-            roughness={0.46}
-            metalness={0.02}
-            clearcoat={0.38}
-            clearcoatRoughness={0.58}
-            polygonOffset
-            polygonOffsetFactor={-1}
-            polygonOffsetUnits={-1}
-          />
-        </mesh>
-
-        <mesh position={[0, 12, -392]} receiveShadow castShadow>
-          <boxGeometry args={[1000, 24, 12]} />
-          <meshStandardMaterial color="#a69384" roughness={0.62} />
-        </mesh>
-        <mesh position={[0, 488, -392]} receiveShadow castShadow>
-          <boxGeometry args={[1000, 18, 8]} />
-          <meshStandardMaterial color="#b9ab9f" roughness={0.58} />
-        </mesh>
-        <mesh position={[-492, 12, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow castShadow>
-          <boxGeometry args={[812, 24, 8]} />
-          <meshStandardMaterial color="#a69384" roughness={0.62} />
-        </mesh>
-        <mesh position={[492, 12, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow castShadow>
-          <boxGeometry args={[812, 24, 8]} />
-          <meshStandardMaterial color="#a69384" roughness={0.62} />
-        </mesh>
-        <mesh position={[-168, 12, 392]} receiveShadow castShadow>
-          <boxGeometry args={[664, 24, 8]} />
-          <meshStandardMaterial color="#9e8a7e" roughness={0.6} />
-        </mesh>
-        <mesh position={[418, 12, 392]} receiveShadow castShadow>
-          <boxGeometry args={[164, 24, 8]} />
-          <meshStandardMaterial color="#9e8a7e" roughness={0.6} />
-        </mesh>
+    <group ref={roomRef}>
+      <Room scale={45} position={[-20, 0, 40]} rotation={[0, Math.PI / 2, 0]} onScreenClick={onComputerClick} />
+      <group scale={4} position={[-30, 5.1, 100]} rotation={[0, Math.PI / 2 + Math.PI / 6, 0]}>
+        <Cat
+          onClick={(event) => {
+            event.stopPropagation();
+            onCatClick();
+          }}
+          onPointerOver={() => {
+            document.body.style.cursor = 'pointer';
+          }}
+          onPointerOut={() => {
+            document.body.style.cursor = 'auto';
+          }}
+        />
       </group>
-    </>
+      <group position={[-90, 4, 60]} rotation={[0, Math.PI / 2 + Math.PI / 6, 0]}>
+        <Yassine
+          scale={35}
+          onClick={(event) => {
+            event.stopPropagation();
+            onAvatarClick();
+          }}
+          onPointerOver={() => {
+            document.body.style.cursor = 'pointer';
+          }}
+          onPointerOut={() => {
+            document.body.style.cursor = 'auto';
+          }}
+        />
+      </group>
+    </group>
   );
 }
 
@@ -278,20 +217,47 @@ function PromptTag({ text }) {
   );
 }
 
+function SceneBanner({ text, visible, isMobile }) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: isMobile ? '50%' : '40px',
+        left: '50%',
+        transform: isMobile ? 'translate(-50%, -50%)' : 'translateX(-50%)',
+        zIndex: 30,
+        backgroundColor: 'rgba(0, 0, 0, 0.55)',
+        color: 'white',
+        border: '1px solid white',
+        padding: '12px 18px',
+        fontFamily: 'monospace',
+        fontSize: '15px',
+        fontWeight: 'bold',
+        letterSpacing: '0.04em',
+        textTransform: 'uppercase',
+        pointerEvents: 'none',
+        whiteSpace: 'nowrap',
+        opacity: visible ? 1 : 0,
+        transition: 'opacity 320ms ease',
+      }}
+    >
+      {text}
+    </div>
+  );
+}
+
 export default function HomePage() {
   const [started, setStarted] = useState(false);
   const [view, setView] = useState('room');
   const [isReturning, setIsReturning] = useState(false);
-  const [showBio, setShowBio] = useState(false);
   const [canvasFrameloop, setCanvasFrameloop] = useState('always');
+  const [showBio, setShowBio] = useState(false);
+  const [isCatBannerVisible, setIsCatBannerVisible] = useState(false);
   const controlsRef = useRef(null);
   const previousViewRef = useRef('room');
+  const catBannerTimerRef = useRef(null);
   const isMobile = window.innerWidth < 830;
-  const { soundEnabled, toggleSound, unlockAudio } = useAmbientAudio({
-    src: '/sounds/ambient.mp3',
-    active: started,
-    muffled: view === 'screen',
-  });
+  const initialCameraPosition = isMobile ? MOBILE_ROOM_CAMERA_POSITION : ROOM_CAMERA_POSITION;
 
   useEffect(() => {
     if (started && previousViewRef.current === 'screen' && view === 'room') {
@@ -303,43 +269,70 @@ export default function HomePage() {
 
   useEffect(() => {
     if (view === 'screen') {
-      // Let the camera fly-in animation finish (~1.5s), then pause 3D rendering
       const timer = setTimeout(() => setCanvasFrameloop('never'), 1500);
       return () => clearTimeout(timer);
     }
     setCanvasFrameloop('always');
   }, [view]);
 
+  useEffect(() => () => {
+    if (catBannerTimerRef.current) {
+      window.clearTimeout(catBannerTimerRef.current);
+    }
+  }, []);
+
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
-      {!started && <LoadingScreen onStarted={() => setStarted(true)} onUnlockAudio={unlockAudio} />}
+      {!started && <LoadingScreen onStarted={() => setStarted(true)} />}
 
-      <StatusOverlay
-        visible={started}
-        soundEnabled={soundEnabled}
-        toggleSound={toggleSound}
-      />
-      <Bio visible={showBio && view === 'room'} onClose={() => setShowBio(false)} />
+      <Bio visible={showBio} onClose={() => setShowBio(false)} />
+      <StatusOverlay visible={started} />
+      {view === 'room' && (
+        <SceneBanner
+          text="Stop disturbing the cat"
+          visible={isCatBannerVisible}
+          isMobile={isMobile}
+        />
+      )}
       {view === 'screen' && (
         <ComputerOS
-          onExit={() => setView('room')}
-          soundEnabled={soundEnabled}
-          toggleSound={toggleSound}
+          onExit={() => {
+            setView('room');
+            setCanvasFrameloop('always');
+          }}
         />
       )}
 
-      <Canvas shadows frameloop={canvasFrameloop} camera={{ position: isMobile ? [0, 250, 500] : ROOM_CAMERA_POSITION, fov: isMobile ? 90 : 45 }}>
+      <Canvas
+        shadows
+        frameloop={canvasFrameloop}
+        camera={{
+          position: initialCameraPosition,
+          fov: isMobile ? 90 : 45,
+          near: 1,
+          far: 1200,
+        }}
+      >
+        <InitialCameraPose controlsRef={controlsRef} position={initialCameraPosition} />
         <DynamicBackground />
         <CameraRig
           view={view}
           controlsRef={controlsRef}
           isReturning={isReturning}
           setIsReturning={setIsReturning}
+          roomCameraPosition={initialCameraPosition}
         />
 
         <ambientLight intensity={0.9} />
         <hemisphereLight skyColor="#ffffff" groundColor="#6f6f6f" intensity={0.9} />
-        <directionalLight position={[100, 200, 100]} intensity={2.8} castShadow shadow-mapSize={[2048, 2048]}>
+        <directionalLight
+          position={[100, 200, 100]}
+          intensity={2.8}
+          castShadow
+          shadow-mapSize={[2048, 2048]}
+          shadow-bias={-0.0008}
+          shadow-normalBias={0.04}
+        >
           <orthographicCamera attach="shadow-camera" args={[-200, 200, 200, -200]} />
         </directionalLight>
         <spotLight position={[0, 80, 300]} intensity={3.2} angle={0.4} penumbra={0.5} />
@@ -347,64 +340,60 @@ export default function HomePage() {
 
         <Suspense fallback={null}>
           <RoomModel
+            onCatClick={() => {
+              playClickSound();
+              setIsCatBannerVisible(true);
+
+              if (catBannerTimerRef.current) {
+                window.clearTimeout(catBannerTimerRef.current);
+              }
+
+              catBannerTimerRef.current = window.setTimeout(() => {
+                setIsCatBannerVisible(false);
+              }, CAT_BANNER_DURATION_MS);
+            }}
+            onAvatarClick={() => {
+              playClickSound();
+              setShowBio((previous) => !previous);
+            }}
             onComputerClick={() => {
               playPowerToggleSound();
               setView('screen');
               setShowBio(false);
             }}
           />
-
-          <Yassine
-            position={[130, 0, 60]}
-            rotation={[0, -0.5, 0]}
-            scale={80}
-            visible={view === 'room'}
-            onClick={(event) => {
-              event.stopPropagation();
-              playClickSound();
-              setShowBio((previous) => !previous);
-            }}
-            onPointerOver={() => {
-              document.body.style.cursor = 'pointer';
-            }}
-            onPointerOut={() => {
-              document.body.style.cursor = 'auto';
-            }}
-          />
-
           {started && view === 'room' && !showBio && (
             <>
-              <OccludedHtml position={[130, 155, 60]} center distanceFactor={150}>
+              <OccludedHtml position={[-90, 75, 60]} center distanceFactor={80}>
                 <PromptTag text="CLICK ON MY AVATAR" />
               </OccludedHtml>
-              <OccludedHtml position={[-3, 120, 30]} center distanceFactor={150}>
+              <OccludedHtml position={[-57, 65, 125]} center distanceFactor={100}>
                 <PromptTag text="CLICK ON THE COMPUTER" />
               </OccludedHtml>
-            </>
-          )}
+            </>)}
         </Suspense>
-
-        <RoomShell />
 
         <OrbitControls
           ref={controlsRef}
           target={ROOM_CAMERA_TARGET}
           enableZoom
-          enablePan
+          enablePan={false}
           panSpeed={1}
+          minAzimuthAngle={MIN_AZIMUTH_ANGLE}
+          maxAzimuthAngle={MAX_AZIMUTH_ANGLE}
           minPolarAngle={0}
           maxPolarAngle={Math.PI / 2.1}
-          minDistance={75}
+          minDistance={0}
           maxDistance={400}
           enabled={started && view === 'room' && !isReturning}
           mouseButtons={{
             LEFT: THREE.MOUSE.ROTATE,
             MIDDLE: THREE.MOUSE.DOLLY,
-            RIGHT: THREE.MOUSE.PAN,
+            RIGHT: THREE.MOUSE.ROTATE,
           }}
           touches={{
             ONE: THREE.TOUCH.ROTATE,
-            TWO: THREE.TOUCH.DOLLY_PAN,
+            TWO: THREE.TOUCH.DOLLY_ROTATE,
           }}
         />
       </Canvas>

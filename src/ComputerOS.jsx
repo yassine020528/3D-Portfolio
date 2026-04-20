@@ -69,7 +69,7 @@ function useBatteryStatus() {
   return battery;
 }
 
-export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
+export default function ComputerOS({ onExit }) {
   const [booted, setBooted] = useState(false);
   const [theme, setTheme] = useState('dark');
   const [showStartMenu, setShowStartMenu] = useState(false);
@@ -445,8 +445,6 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
       <Taskbar
         windows={windows}
         battery={battery}
-        soundEnabled={soundEnabled}
-        toggleSound={toggleSound}
         time={time}
         showStartMenu={showStartMenu}
         setShowStartMenu={(value) => {
