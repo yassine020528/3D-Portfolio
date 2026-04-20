@@ -6,6 +6,7 @@ import useClock from './hooks/useClock';
 import useWindowManager from './hooks/useWindowManager';
 import { playClickSound, playKeyboardSound, playPowerToggleSound } from './lib/sound';
 import DesktopIcon from './features/os/DesktopIcon';
+import Cat from './features/os/Cat';
 import FullscreenFigureModal from './features/os/FullscreenFigureModal';
 import osStyles from './features/os/osStyles';
 import Taskbar from './features/os/Taskbar';
@@ -72,6 +73,8 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
   const [booted, setBooted] = useState(false);
   const [theme, setTheme] = useState('dark');
   const [showStartMenu, setShowStartMenu] = useState(false);
+  const [showCatMenu, setShowCatMenu] = useState(false);
+  const [isCatSleeping, setIsCatSleeping] = useState(false);
   const [termInput, setTermInput] = useState('');
   const [termHistory, setTermHistory] = useState(["Welcome to Shell v1.0. Type 'help' for commands."]);
   const [expandedProjectId, setExpandedProjectId] = useState(null);
@@ -87,6 +90,8 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
   const battery = useBatteryStatus();
   const formRef = useRef(null);
   const termEndRef = useRef(null);
+  const catMenuRef = useRef(null);
+  const catTriggerRef = useRef(null);
 
   const {
     windows,
@@ -238,6 +243,19 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
     setFullscreenFigure(null);
   };
 
+  const handleCatToggle = (event) => {
+    playClickSound();
+    event.stopPropagation();
+    setShowStartMenu(false);
+    setShowCatMenu((current) => !current);
+  };
+
+  const handleCatAction = () => {
+    playClickSound();
+    setIsCatSleeping((current) => !current);
+    setShowCatMenu(false);
+  };
+
   useEffect(() => {
     const bootTimer = window.setTimeout(() => setBooted(true), 1000);
     return () => window.clearTimeout(bootTimer);
@@ -252,11 +270,34 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
       if (event.key === 'Escape' && fullscreenFigure) {
         closeFullscreenFigure('keyboard');
       }
+
+      if (event.key === 'Escape' && showCatMenu) {
+        setShowCatMenu(false);
+      }
     };
 
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
-  }, [fullscreenFigure]);
+  }, [fullscreenFigure, showCatMenu]);
+
+  useEffect(() => {
+    if (!showCatMenu) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event) => {
+      const target = event.target;
+
+      if (catMenuRef.current?.contains(target) || catTriggerRef.current?.contains(target)) {
+        return;
+      }
+
+      setShowCatMenu(false);
+    };
+
+    window.addEventListener('pointerdown', handlePointerDown);
+    return () => window.removeEventListener('pointerdown', handlePointerDown);
+  }, [showCatMenu]);
 
   if (!booted) {
     return null;
@@ -357,6 +398,23 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
         termEndRef={termEndRef}
       />
 
+      <div className="cat-shell" ref={catTriggerRef}>
+        <Cat onClick={handleCatToggle} menuOpen={showCatMenu} isSleeping={isCatSleeping} />
+        {showCatMenu && (
+          <div className="cat-menu" ref={catMenuRef} role="menu" aria-label="Sanjer actions">
+            <div className="cat-menu-title">Sanjer</div>
+            <button
+              type="button"
+              className="cat-menu-item"
+              role="menuitem"
+              onClick={handleCatAction}
+            >
+              {isCatSleeping ? 'Wake Up' : 'Sleep'}
+            </button>
+          </div>
+        )}
+      </div>
+
       <Taskbar
         windows={windows}
         battery={battery}
@@ -364,7 +422,10 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
         toggleSound={toggleSound}
         time={time}
         showStartMenu={showStartMenu}
-        setShowStartMenu={setShowStartMenu}
+        setShowStartMenu={(value) => {
+          setShowCatMenu(false);
+          setShowStartMenu(value);
+        }}
         openWindow={openWindow}
         onShutdown={handleShutdown}
         batteryColor={batteryColor}

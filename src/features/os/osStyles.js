@@ -14,7 +14,12 @@ const osStyles = `
   }
   @keyframes scanBand { 0% { transform: translateY(-50%); } 100% { transform: translateY(25%); } }
 
-  .os-container { background-color: var(--bg-color); color: var(--text-color); user-select: none; }
+  .os-container {
+    --taskbar-height: 45px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    user-select: none;
+  }
 
   .desktop {
     position: relative;
@@ -61,11 +66,81 @@ const osStyles = `
 
   .taskbar {
     position: absolute; bottom: 0; width: 100%;
-    height: auto; min-height: 45px;
+    height: auto; min-height: var(--taskbar-height);
     background: var(--header-bg); border-top: 1px solid var(--border-color);
     display: flex; align-items: center; padding: 0 15px;
     padding-bottom: env(safe-area-inset-bottom);
     justify-content: space-between; z-index: 1000;
+  }
+
+  .cat-shell {
+    position: absolute;
+    right: clamp(22px, 4vw, 48px);
+    bottom: calc(var(--taskbar-height) + env(safe-area-inset-bottom));
+    z-index: 1500;
+  }
+
+  .cat {
+    position: relative;
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    transform-origin: bottom right;
+    transform: scale(1.8);
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));
+    z-index: 1;
+    border: none;
+    padding: 0;
+    line-height: 0;
+    background-color: transparent;
+  }
+  .cat.open { filter: drop-shadow(0 0 0 rgba(0,0,0,0)) drop-shadow(0 10px 16px rgba(0,0,0,0.32)); }
+  .cat:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 4px; }
+
+  .cat-menu {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 16px);
+    width: 190px;
+    background: color-mix(in srgb, var(--window-bg) 92%, #000000 8%);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.32);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    animation: fadeIn 0.16s ease;
+  }
+
+  .cat-menu-title {
+    padding: 2px 4px 8px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-color);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 2px;
+  }
+
+  .cat-menu-item {
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-color);
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 0.88rem;
+  }
+  .cat-menu-item:hover,
+  .cat-menu-item:focus-visible {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.08);
+    outline: none;
   }
 
   .start-btn { background: var(--accent-color); color: var(--bg-color); padding: 5px 15px; border-radius: 4px; font-weight: bold; margin-bottom: env(safe-area-inset-bottom); }
@@ -542,6 +617,17 @@ const osStyles = `
     .fullscreen-figure-modal { max-width: 100%; }
     .fullscreen-figure-close { top: -4px; right: 0; }
     .fullscreen-figure-image { height: clamp(240px, 58vh, 520px); }
+    .cat-shell {
+      right: clamp(16px, 4vw, 32px);
+      bottom: calc(var(--taskbar-height) + env(safe-area-inset-bottom));
+    }
+    .cat {
+      transform: scale(1.45);
+    }
+    .cat-menu {
+      width: min(180px, calc(100vw - 24px));
+      bottom: calc(100% + 12px);
+    }
   }
 
   @media (max-width: 980px) {
