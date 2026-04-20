@@ -102,7 +102,7 @@ const osStyles = `
   .cat-menu {
     position: absolute;
     right: 0;
-    bottom: calc(100% + 28px);
+    bottom: calc(100% + 40px);
     width: 190px;
     background: color-mix(in srgb, var(--window-bg) 92%, #000000 8%);
     border: 1px solid var(--border-color);
@@ -626,7 +626,7 @@ const osStyles = `
     }
     .cat-menu {
       width: min(180px, calc(100vw - 24px));
-      bottom: calc(100% + 20px);
+      bottom: calc(100% + 32px);
     }
   }
 

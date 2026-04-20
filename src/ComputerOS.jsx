@@ -408,7 +408,7 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
         <Cat onClick={handleCatToggle} menuOpen={showCatMenu} posture={catPosture} />
         {showCatMenu && (
           <div className="cat-menu" ref={catMenuRef} role="menu" aria-label="Sanjer actions">
-            <div className="cat-menu-title">Sanjer</div>
+            <div className="cat-menu-title">"Sanjer" the cat</div>
             {catPosture === 'sleep' ? (
               <button
                 type="button"

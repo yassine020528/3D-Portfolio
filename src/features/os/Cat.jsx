@@ -90,7 +90,7 @@ export default function Cat({ onClick, menuOpen = false, posture = 'idle' }) {
     }
 
     if (visualState === 'meow') {
-      setFrameIndex(0);
+      setFrameIndex(CAT_MEOW_FRAMES - 1);
 
       let sequenceIndex = 0;
       const intervalId = window.setInterval(() => {
@@ -102,7 +102,7 @@ export default function Cat({ onClick, menuOpen = false, posture = 'idle' }) {
           return;
         }
 
-        setFrameIndex(sequenceIndex);
+        setFrameIndex(CAT_MEOW_FRAMES - 1 - sequenceIndex);
       }, interval);
 
       return () => window.clearInterval(intervalId);
