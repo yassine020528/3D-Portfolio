@@ -1,47 +1,55 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 const CAT_INTERVAL_MS = 125;
+const CAT_SLEEP_INTERVAL_MS = 250;
 const CAT_CROP_TOP = 16;
 const CAT_CROP_HEIGHT = 32;
-const CAT_CROP_LEFT_RATIO = 1 / 4;
-const CAT_CROP_WIDTH_RATIO = 0.6;
+const CAT_CROP_LEFT_RATIO = 1 / 6;
+const CAT_CROP_WIDTH_RATIO = 0.8;
 
-const CAT_IDLE_FRAMES = 8;
-const CAT_SLEEP_FRAMES = 8;
-const CAT_WAKE_UP_FRAMES = 2;
-const CAT_LICK_FRAMES = 15;
+const CAT_IDLE_FRAMES = 12;
+const CAT_SIT_FRAMES = 7;
+const CAT_SLEEP_FRAMES = 4;
+const CAT_MEOW_FRAMES = 7;
 const CAT_IDLE_SPRITE = '/cat/IDLE.png';
+const CAT_SIT_SPRITE = '/cat/SIT.png';
 const CAT_SLEEP_SPRITE = '/cat/SLEEP.png';
-const CAT_WAKE_UP_SPRITE = '/cat/WAKING_UP.png';
-const CAT_LICK_SPRITE = '/cat/LICK.png';
-const CAT_LICK_INTERVAL_MS = 10000;
+const CAT_MEOW_SPRITE = '/cat/MEOW.png';
+const CAT_MEOW_INTERVAL_MS = 10000;
 
-export default function Cat({ onClick, menuOpen = false, isSleeping = false }) {
-  const [visualState, setVisualState] = useState(isSleeping ? 'sleep' : 'idle');
+export default function Cat({ onClick, menuOpen = false, posture = 'idle' }) {
+  const restingState = posture === 'sleep' ? 'sleep' : posture === 'sit' ? 'sit' : 'idle';
+  const [visualState, setVisualState] = useState(restingState);
   const [frameIndex, setFrameIndex] = useState(0);
   const [spriteSize, setSpriteSize] = useState({ frameWidth: 0, width: 0, height: 0 });
-  const previousSleepingRef = useRef(isSleeping);
+
+  const interval = visualState === 'sleep' ? CAT_SLEEP_INTERVAL_MS : CAT_INTERVAL_MS;
 
   const frameCount = visualState === 'idle'
     ? CAT_IDLE_FRAMES
+    : visualState === 'sit'
+      ? CAT_SIT_FRAMES
     : visualState === 'sleep'
       ? CAT_SLEEP_FRAMES
-      : visualState === 'lick'
-        ? CAT_LICK_FRAMES
-      : CAT_WAKE_UP_FRAMES;
+      : CAT_MEOW_FRAMES;
 
   const spriteSrc = visualState === 'idle'
     ? CAT_IDLE_SPRITE
+    : visualState === 'sit'
+      ? CAT_SIT_SPRITE
     : visualState === 'sleep'
       ? CAT_SLEEP_SPRITE
-      : visualState === 'lick'
-        ? CAT_LICK_SPRITE
-      : CAT_WAKE_UP_SPRITE;
+      : CAT_MEOW_SPRITE;
 
   useEffect(() => {
     const sprite = new Image();
+    let isMounted = true;
 
     sprite.src = spriteSrc;
     sprite.onload = () => {
+      if (!isMounted) {
+        return;
+      }
+
       const frameWidth = sprite.naturalWidth / frameCount;
 
       setSpriteSize({
@@ -50,6 +58,10 @@ export default function Cat({ onClick, menuOpen = false, isSleeping = false }) {
         height: CAT_CROP_HEIGHT,
       });
     };
+
+    return () => {
+      isMounted = false;
+    };
   }, [frameCount, spriteSrc]);
 
   useEffect(() => {
@@ -57,75 +69,67 @@ export default function Cat({ onClick, menuOpen = false, isSleeping = false }) {
   }, [visualState]);
 
   useEffect(() => {
-    if (visualState === 'idle' || visualState === 'sleep') {
+    if (visualState === 'sleep') {
+      const sleepFrames = [0, 3, 2, 1, 2, 3];
+
+      let sequenceIndex = 0;
       const intervalId = window.setInterval(() => {
-        setFrameIndex((currentFrame) => (currentFrame + 1) % frameCount);
-      }, CAT_INTERVAL_MS);
+        sequenceIndex = (sequenceIndex + 1) % sleepFrames.length;
+        setFrameIndex(sleepFrames[sequenceIndex]);
+      }, interval);
 
       return () => window.clearInterval(intervalId);
     }
 
-    if (visualState === 'lick') {
+    if (visualState === 'idle' || visualState === 'sit') {
+      const intervalId = window.setInterval(() => {
+        setFrameIndex((currentFrame) => (currentFrame + 1) % frameCount);
+      }, interval);
+
+      return () => window.clearInterval(intervalId);
+    }
+
+    if (visualState === 'meow') {
       setFrameIndex(0);
 
       let sequenceIndex = 0;
       const intervalId = window.setInterval(() => {
         sequenceIndex += 1;
 
-        if (sequenceIndex >= CAT_LICK_FRAMES) {
+        if (sequenceIndex >= CAT_MEOW_FRAMES) {
           window.clearInterval(intervalId);
-          setVisualState('idle');
+          setVisualState('sit');
           return;
         }
 
         setFrameIndex(sequenceIndex);
-      }, CAT_INTERVAL_MS);
+      }, interval);
 
       return () => window.clearInterval(intervalId);
     }
 
-    const frameSequence = isSleeping
-      ? Array.from({ length: CAT_WAKE_UP_FRAMES }, (_, index) => CAT_WAKE_UP_FRAMES - 1 - index)
-      : Array.from({ length: CAT_WAKE_UP_FRAMES }, (_, index) => index);
-
-    setFrameIndex(frameSequence[0]);
-
-    let sequenceIndex = 0;
-    const intervalId = window.setInterval(() => {
-      sequenceIndex += 1;
-
-      if (sequenceIndex >= frameSequence.length) {
-        window.clearInterval(intervalId);
-        setVisualState(isSleeping ? 'sleep' : 'idle');
-        return;
-      }
-
-      setFrameIndex(frameSequence[sequenceIndex]);
-    }, CAT_INTERVAL_MS);
-
-    return () => window.clearInterval(intervalId);
-  }, [frameCount, isSleeping, visualState]);
+    return undefined;
+  }, [frameCount, interval, visualState]);
 
   useEffect(() => {
-    if (previousSleepingRef.current === isSleeping) {
+    if (visualState === 'meow' && posture === 'sit') {
       return;
     }
 
-    previousSleepingRef.current = isSleeping;
-    setVisualState('transition');
-  }, [isSleeping]);
+    setVisualState(restingState);
+  }, [posture, restingState, visualState]);
 
   useEffect(() => {
-    if (isSleeping || visualState !== 'idle') {
+    if (posture !== 'sit' || visualState !== 'sit') {
       return undefined;
     }
 
     const timeoutId = window.setTimeout(() => {
-      setVisualState('lick');
-    }, CAT_LICK_INTERVAL_MS);
+      setVisualState('meow');
+    }, CAT_MEOW_INTERVAL_MS);
 
     return () => window.clearTimeout(timeoutId);
-  }, [isSleeping, visualState]);
+  }, [posture, visualState]);
 
   if (!spriteSize.width || !spriteSize.height) {
     return null;

@@ -88,7 +88,7 @@ const osStyles = `
     background-repeat: no-repeat;
     cursor: pointer;
     transform-origin: bottom right;
-    transform: scale(1.8);
+    transform: scale(3);
     filter: drop-shadow(0 6px 10px rgba(0,0,0,0.28));
     z-index: 1;
     border: none;
@@ -102,7 +102,7 @@ const osStyles = `
   .cat-menu {
     position: absolute;
     right: 0;
-    bottom: calc(100% + 16px);
+    bottom: calc(100% + 28px);
     width: 190px;
     background: color-mix(in srgb, var(--window-bg) 92%, #000000 8%);
     border: 1px solid var(--border-color);
@@ -622,11 +622,11 @@ const osStyles = `
       bottom: calc(var(--taskbar-height) + env(safe-area-inset-bottom));
     }
     .cat {
-      transform: scale(1.45);
+      transform: scale(3);
     }
     .cat-menu {
       width: min(180px, calc(100vw - 24px));
-      bottom: calc(100% + 12px);
+      bottom: calc(100% + 20px);
     }
   }
 

@@ -74,7 +74,7 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
   const [theme, setTheme] = useState('dark');
   const [showStartMenu, setShowStartMenu] = useState(false);
   const [showCatMenu, setShowCatMenu] = useState(false);
-  const [isCatSleeping, setIsCatSleeping] = useState(false);
+  const [catPosture, setCatPosture] = useState('sit');
   const [termInput, setTermInput] = useState('');
   const [termHistory, setTermHistory] = useState(["Welcome to Shell v1.0. Type 'help' for commands."]);
   const [expandedProjectId, setExpandedProjectId] = useState(null);
@@ -250,9 +250,15 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
     setShowCatMenu((current) => !current);
   };
 
-  const handleCatAction = () => {
+  const handleCatSleepToggle = () => {
     playClickSound();
-    setIsCatSleeping((current) => !current);
+    setCatPosture((current) => (current === 'sleep' ? 'sit' : 'sleep'));
+    setShowCatMenu(false);
+  };
+
+  const handleCatSitToggle = () => {
+    playClickSound();
+    setCatPosture((current) => (current === 'sit' ? 'idle' : 'sit'));
     setShowCatMenu(false);
   };
 
@@ -399,18 +405,39 @@ export default function ComputerOS({ onExit, soundEnabled, toggleSound }) {
       />
 
       <div className="cat-shell" ref={catTriggerRef}>
-        <Cat onClick={handleCatToggle} menuOpen={showCatMenu} isSleeping={isCatSleeping} />
+        <Cat onClick={handleCatToggle} menuOpen={showCatMenu} posture={catPosture} />
         {showCatMenu && (
           <div className="cat-menu" ref={catMenuRef} role="menu" aria-label="Sanjer actions">
             <div className="cat-menu-title">Sanjer</div>
-            <button
-              type="button"
-              className="cat-menu-item"
-              role="menuitem"
-              onClick={handleCatAction}
-            >
-              {isCatSleeping ? 'Wake Up' : 'Sleep'}
-            </button>
+            {catPosture === 'sleep' ? (
+              <button
+                type="button"
+                className="cat-menu-item"
+                role="menuitem"
+                onClick={handleCatSleepToggle}
+              >
+                Wake Up
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="cat-menu-item"
+                  role="menuitem"
+                  onClick={handleCatSitToggle}
+                >
+                  {catPosture === 'sit' ? 'Stand Up' : 'Sit'}
+                </button>
+                <button
+                  type="button"
+                  className="cat-menu-item"
+                  role="menuitem"
+                  onClick={handleCatSleepToggle}
+                >
+                  Sleep
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>

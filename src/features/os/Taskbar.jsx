@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { startMenuItems } from '../../data/osData';
 import SoundToggleButton from '../../components/shared/SoundToggleButton';
 
@@ -108,6 +109,28 @@ export default function Taskbar({
   batteryBoltColor,
   batteryBoltStrokeColor,
 }) {
+  const startMenuRef = useRef(null);
+  const startButtonRef = useRef(null);
+
+  useEffect(() => {
+    if (!showStartMenu) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event) => {
+      const target = event.target;
+
+      if (startMenuRef.current?.contains(target) || startButtonRef.current?.contains(target)) {
+        return;
+      }
+
+      setShowStartMenu(false);
+    };
+
+    window.addEventListener('pointerdown', handlePointerDown);
+    return () => window.removeEventListener('pointerdown', handlePointerDown);
+  }, [showStartMenu, setShowStartMenu]);
+
   return (
     <>
       <div
@@ -122,7 +145,14 @@ export default function Taskbar({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
-          <div className="start-btn" style={{ flexShrink: 0 }} onClick={() => setShowStartMenu((value) => !value)}>START</div>
+          <div
+            ref={startButtonRef}
+            className="start-btn"
+            style={{ flexShrink: 0 }}
+            onClick={() => setShowStartMenu((value) => !value)}
+          >
+            START
+          </div>
           <div className="running-apps" style={{ display: 'flex', gap: '5px', overflow: 'hidden' }}>
             {Object.values(windows)
               .sort((a, b) => a.zIndex - b.zIndex)
@@ -182,14 +212,29 @@ export default function Taskbar({
       </div>
 
       {showStartMenu && (
-        <div className="start-menu">
+        <div className="start-menu" ref={startMenuRef}>
           {startMenuItems.map((item) => (
-            <div key={item.id} className="menu-item" onClick={() => openWindow(item.id)}>
+            <div
+              key={item.id}
+              className="menu-item"
+              onClick={() => {
+                setShowStartMenu(false);
+                openWindow(item.id);
+              }}
+            >
               {item.label}
             </div>
           ))}
           <hr style={{ width: '100%', borderColor: 'var(--border-color)', margin: '5px 0' }} />
-          <div className="menu-item danger" onClick={onShutdown}><strong>⏻ Shut Down</strong></div>
+          <div
+            className="menu-item danger"
+            onClick={(event) => {
+              setShowStartMenu(false);
+              onShutdown(event);
+            }}
+          >
+            <strong>⏻ Shut Down</strong>
+          </div>
         </div>
       )}
     </>
