@@ -11,7 +11,7 @@ import Yassine from '../Yassine';
 import LoadingScreen from '../components/shared/LoadingScreen';
 import OccludedHtml from '../components/shared/OccludedHtml';
 import StatusOverlay from '../components/shared/StatusOverlay';
-import { playClickSound, playCatSound,playPowerToggleSound } from '../lib/sound';
+import { playClickSound, playCatSound, playPowerToggleSound } from '../lib/sound';
 
 const ROOM_CAMERA_POSITION = [60, 80, -60];
 
@@ -26,6 +26,17 @@ const FLOOR_BASE_NAME = 'Cube006_Material013_0';
 const FLOOR_SURFACE_LIFT = 0.12;
 const HIDDEN_MESH_NAMES = new Set(['Plane001_Material042_0']);
 const CAT_BANNER_DURATION_MS = 2000;
+const ROTATION_HINT_DURATION_MS = 5000;
+const MOBILE_BREAKPOINT = 830;
+const CONTROL_BANNER_TOP = '20px';
+const CONTROL_BANNER_SIDE = '20px';
+const CONTROL_BANNER_MOBILE_BOTTOM = 'calc(env(safe-area-inset-bottom, 0px) + 56px)';
+const CAT_BANNER_TOP = '20px';
+const CONTROL_ICON_PATHS = {
+  drag: '/mouse-icons/drag.png',
+  scroll: '/mouse-icons/scroll.png',
+  pinch: '/mouse-icons/pinch.png',
+};
 
 function getAzimuthAngleFromPosition(position, target) {
   return Math.atan2(position[0] - target[0], position[2] - target[2]);
@@ -217,12 +228,70 @@ function PromptTag({ text }) {
   );
 }
 
-function SceneBanner({ text, visible, isMobile }) {
+function ControlBanner({ items, visible, isMobile }) {
   return (
     <div
       style={{
         position: 'absolute',
-        top: isMobile ? '50%' : '40px',
+        top: isMobile ? 'auto' : CONTROL_BANNER_TOP,
+        right: isMobile ? 'auto' : CONTROL_BANNER_SIDE,
+        bottom: isMobile ? CONTROL_BANNER_MOBILE_BOTTOM : 'auto',
+        left: isMobile ? '50%' : 'auto',
+        transform: isMobile ? 'translateX(-50%)' : 'none',
+        zIndex: 30,
+        backgroundColor: '#ffffff',
+        color: '#111111',
+        border: '1px solid rgba(17, 17, 17, 0.14)',
+        borderRadius: '14px',
+        padding: '10px 12px',
+        fontFamily: 'monospace',
+        fontSize: '11px',
+        fontWeight: 'bold',
+        letterSpacing: '0.03em',
+        textTransform: 'uppercase',
+        pointerEvents: 'none',
+        lineHeight: 1.35,
+        textAlign: 'left',
+        minWidth: isMobile ? '245px' : '190px',
+        boxShadow: '0 12px 32px rgba(0, 0, 0, 0.16)',
+        opacity: visible ? 1 : 0,
+        transition: 'opacity 320ms ease',
+      }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {items.map(({ icon, text }) => (
+          <div
+            key={text}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <img
+              src={icon}
+              alt=""
+              style={{
+                width: '18px',
+                height: '18px',
+                objectFit: 'contain',
+                flexShrink: 0,
+              }}
+            />
+            <span>{text}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CatBanner({ visible, isMobile, text }) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: isMobile ? '50%' : CAT_BANNER_TOP,
         left: '50%',
         transform: isMobile ? 'translate(-50%, -50%)' : 'translateX(-50%)',
         zIndex: 30,
@@ -253,11 +322,22 @@ export default function HomePage() {
   const [canvasFrameloop, setCanvasFrameloop] = useState('always');
   const [showBio, setShowBio] = useState(false);
   const [isCatBannerVisible, setIsCatBannerVisible] = useState(false);
+  const [showRotationHint, setShowRotationHint] = useState(false);
   const controlsRef = useRef(null);
   const previousViewRef = useRef('room');
   const catBannerTimerRef = useRef(null);
-  const isMobile = window.innerWidth < 830;
+  const rotationHintTimerRef = useRef(null);
+  const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
   const initialCameraPosition = isMobile ? MOBILE_ROOM_CAMERA_POSITION : ROOM_CAMERA_POSITION;
+  const controlBannerItems = isMobile
+    ? [
+      { icon: CONTROL_ICON_PATHS.drag, text: 'Tap and drag to look around' },
+      { icon: CONTROL_ICON_PATHS.pinch, text: 'Pinch to zoom' },
+    ]
+    : [
+      { icon: CONTROL_ICON_PATHS.drag, text: 'Click and drag to look around' },
+      { icon: CONTROL_ICON_PATHS.scroll, text: 'Scroll to zoom' },
+    ];
 
   useEffect(() => {
     if (started && previousViewRef.current === 'screen' && view === 'room') {
@@ -275,9 +355,30 @@ export default function HomePage() {
     setCanvasFrameloop('always');
   }, [view]);
 
+  useEffect(() => {
+    if (!started) {
+      return undefined;
+    }
+
+    setShowRotationHint(true);
+    rotationHintTimerRef.current = window.setTimeout(() => {
+      setShowRotationHint(false);
+    }, ROTATION_HINT_DURATION_MS);
+
+    return () => {
+      if (rotationHintTimerRef.current) {
+        window.clearTimeout(rotationHintTimerRef.current);
+      }
+    };
+  }, [started]);
+
   useEffect(() => () => {
     if (catBannerTimerRef.current) {
       window.clearTimeout(catBannerTimerRef.current);
+    }
+
+    if (rotationHintTimerRef.current) {
+      window.clearTimeout(rotationHintTimerRef.current);
     }
   }, []);
 
@@ -288,7 +389,14 @@ export default function HomePage() {
       <Bio visible={showBio} onClose={() => setShowBio(false)} />
       <StatusOverlay visible={started} />
       {view === 'room' && (
-        <SceneBanner
+        <ControlBanner
+          items={controlBannerItems}
+          visible={showRotationHint}
+          isMobile={isMobile}
+        />
+      )}
+      {view === 'room' && (
+        <CatBanner
           text="Stop disturbing the cat"
           visible={isCatBannerVisible}
           isMobile={isMobile}
