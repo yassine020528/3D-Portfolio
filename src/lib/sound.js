@@ -11,6 +11,7 @@ const replay = (audio) => {
 
 const clickAudio = preload('/sounds/click.mp3');
 const powerAudio = preload('/sounds/on-off-sound.mp3', 0.5);
+const catAudio = preload('/sounds/cat-meow.mp3', 0.2);
 const keyboardAudios = [
   '/sounds/keyboard/key_1.mp3',
   '/sounds/keyboard/key_2.mp3',
@@ -21,6 +22,7 @@ const keyboardAudios = [
 ].map((src) => preload(src));
 
 export const playClickSound = () => replay(clickAudio);
+export const playCatSound = () => replay(catAudio);
 export const playPowerToggleSound = () => replay(powerAudio);
 export const playKeyboardSound = () => {
   replay(keyboardAudios[Math.floor(Math.random() * keyboardAudios.length)]);

@@ -407,8 +407,8 @@ export default function ComputerOS({ onExit }) {
       <div className="cat-shell" ref={catTriggerRef}>
         <Cat onClick={handleCatToggle} menuOpen={showCatMenu} posture={catPosture} />
         {showCatMenu && (
-          <div className="cat-menu" ref={catMenuRef} role="menu" aria-label="Sanjer actions">
-            <div className="cat-menu-title">"Sanjer" the cat</div>
+          <div className="cat-menu" ref={catMenuRef} role="menu" aria-label="Cat actions">
+            <div className="cat-menu-title">Cat</div>
             {catPosture === 'sleep' ? (
               <button
                 type="button"

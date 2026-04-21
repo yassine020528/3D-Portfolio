@@ -139,7 +139,7 @@ export default function Cat({ onClick, menuOpen = false, posture = 'idle' }) {
     <button
       type="button"
       className={`cat ${menuOpen ? 'open' : ''}`}
-      aria-label="Open Sanjer actions"
+      aria-label="Open Cat actions"
       aria-haspopup="menu"
       aria-expanded={menuOpen}
       onClick={onClick}

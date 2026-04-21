@@ -11,7 +11,7 @@ import Yassine from '../Yassine';
 import LoadingScreen from '../components/shared/LoadingScreen';
 import OccludedHtml from '../components/shared/OccludedHtml';
 import StatusOverlay from '../components/shared/StatusOverlay';
-import { playClickSound, playPowerToggleSound } from '../lib/sound';
+import { playClickSound, playCatSound,playPowerToggleSound } from '../lib/sound';
 
 const ROOM_CAMERA_POSITION = [60, 80, -60];
 
@@ -341,7 +341,7 @@ export default function HomePage() {
         <Suspense fallback={null}>
           <RoomModel
             onCatClick={() => {
-              playClickSound();
+              playCatSound();
               setIsCatBannerVisible(true);
 
               if (catBannerTimerRef.current) {
@@ -369,6 +369,9 @@ export default function HomePage() {
               </OccludedHtml>
               <OccludedHtml position={[-57, 65, 125]} center distanceFactor={100}>
                 <PromptTag text="CLICK ON THE COMPUTER" />
+              </OccludedHtml>
+              <OccludedHtml position={[-30, 15, 100]} center distanceFactor={90}>
+                <PromptTag text="DON'T CLICK ON THE CAT" />
               </OccludedHtml>
             </>)}
         </Suspense>
