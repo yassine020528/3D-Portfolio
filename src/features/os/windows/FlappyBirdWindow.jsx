@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { playSoundEffect, registerSoundEffect } from '../../../lib/sound';
 import WindowFrame from '../WindowFrame';
 
 const W = 420;
@@ -39,16 +40,10 @@ const SPRITES = {
 };
 
 const SOUNDS = {
-  wing: '/flappy/audio/wing.wav',
-  point: '/flappy/audio/point.wav',
-  hit: '/flappy/audio/hit.wav',
+  wing: registerSoundEffect('/flappy/audio/wing.wav'),
+  point: registerSoundEffect('/flappy/audio/point.wav'),
+  hit: registerSoundEffect('/flappy/audio/hit.wav'),
 };
-
-function playSound(src) {
-  try {
-    new Audio(src).play().catch(() => {});
-  } catch {}
-}
 
 function initState() {
   return {
@@ -117,10 +112,10 @@ export default function FlappyBirdWindow({ windowState, controls }) {
     if (s.phase === 'idle') {
       s.phase = 'playing';
       s.bird.vy = JUMP_VY;
-      playSound(SOUNDS.wing);
+      playSoundEffect(SOUNDS.wing);
     } else if (s.phase === 'playing') {
       s.bird.vy = JUMP_VY;
-      playSound(SOUNDS.wing);
+      playSoundEffect(SOUNDS.wing);
     } else if (s.phase === 'dead') {
       if (s.deadAt !== null && Date.now() - s.deadAt < 1000) {
         return;
@@ -150,7 +145,7 @@ export default function FlappyBirdWindow({ windowState, controls }) {
     const playableH = H - BASE_H;
 
     const die = (s) => {
-      playSound(SOUNDS.hit);
+      playSoundEffect(SOUNDS.hit);
       s.phase = 'dead';
       s.deadAt = Date.now();
       if (s.score > highScoreRef.current) {
@@ -185,7 +180,7 @@ export default function FlappyBirdWindow({ windowState, controls }) {
           if (!p.passed && p.x + PIPE_W < BIRD_X) {
             p.passed = true;
             s.score++;
-            playSound(SOUNDS.point);
+            playSoundEffect(SOUNDS.point);
           }
         }
         s.pipes = s.pipes.filter((p) => p.x + PIPE_W > 0);

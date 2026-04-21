@@ -244,20 +244,18 @@ export default function ComputerOS({ onExit }) {
   };
 
   const handleCatToggle = (event) => {
-    playClickSound();
     event.stopPropagation();
+    playClickSound();
     setShowStartMenu(false);
     setShowCatMenu((current) => !current);
   };
 
   const handleCatSleepToggle = () => {
-    playClickSound();
     setCatPosture((current) => (current === 'sleep' ? 'sit' : 'sleep'));
     setShowCatMenu(false);
   };
 
   const handleCatSitToggle = () => {
-    playClickSound();
     setCatPosture((current) => (current === 'sit' ? 'idle' : 'sit'));
     setShowCatMenu(false);
   };
