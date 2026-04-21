@@ -118,11 +118,11 @@ export const mobileApps = [
     id: 3,
     title: 'Running Tracker',
     platform: 'Android',
-    tech: 'Kotlin, Jetpack Compose',
+    tech: 'Kotlin, Jetpack Compose, Firebase',
     appLogo: '/images/android-logo3.png',
-    techLogos: ['/logos/kotlin.svg', '/logos/jetpack-compose.svg'],
+    techLogos: ['/logos/kotlin.svg', '/logos/jetpack-compose.svg', '/logos/firebase.svg'],
     screenshots: ['/images/android5.jpg', '/images/android6.jpg'],
-    description: 'A location-aware running and walking app designed around session flow, route awareness, and lightweight networking. It uses Retrofit and OkHttp for connected features, Compose Navigation for a smooth in-app structure, and a mobile-first UI that keeps the important stats front and center while moving.',
+    description: 'A location-aware running and walking app designed around session flow, route awareness, and lightweight networking. It uses Retrofit and OkHttp for connected features, Firebase for cloud synchronization, Compose Navigation for a smooth in-app structure, and a mobile-first UI that keeps the important stats front and center while moving.',
   },
   {
     id: 4,
@@ -132,7 +132,7 @@ export const mobileApps = [
     appLogo: '/images/ios-logo1.png',
     techLogos: ['/logos/swift.svg'],
     screenshots: ['/images/ios1.PNG', '/images/ios2.PNG'],
-    description: 'An iOS school tracker built in SwiftUI to organize classes, deadlines, and weighted progress and grade calculations in one place. The app uses on-device persistence with UserDefaults and Codable JSON encoding, and it centers the experience around planning coursework visually in a calendar based approach instead of letting assignments pile up invisibly.',
+    description: 'An iOS school tracker built in SwiftUI to organize classes, deadlines, weighted progress and grade calculations in one place. The app uses on-device persistence with UserDefaults and Codable JSON encoding, and it centers the experience around planning coursework visually in a calendar based approach instead of letting assignments pile up invisibly.',
   },
 ];
 

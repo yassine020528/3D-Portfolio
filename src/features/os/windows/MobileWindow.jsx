@@ -96,8 +96,8 @@ export default function MobileWindow({ windowState, controls, expandedMobileId, 
 
                   <div className="mobile-app-shots">
                     {app.screenshots.map((shot, shotIndex) => (
-                      <div key={`${app.title}-shot-${shotIndex}`} style={{ width: '108px' }}>
-                        <div style={{ width: '108px', height: '216px', borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--border-color)', background: 'rgba(0,0,0,0.3)' }}>
+                      <div key={`${app.title}-shot-${shotIndex}`} style={{ width: '70px' }}>
+                        <div style={{ width: '70px', height: '140px', borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--border-color)', background: 'rgba(0,0,0,0.3)' }}>
                           <img
                             src={shot}
                             alt={`${app.title} screenshot ${shotIndex + 1}`}
