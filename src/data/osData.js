@@ -167,10 +167,10 @@ export const projects = [
   {
     id: 4,
     title: 'Hydro-Quebec Weather Forecasting Platform',
-    tech: 'Angular, .NET, GDAL, Leaflet, SQLite, RESTful API',
-    description: 'Developed a full-stack weather visualization platform for real-time multi-model forecast. Implemented GDAL raster processing and Leaflet for interactive geospatial mapping, supported by a RESTful API and SQLite database.',
+    tech: 'Angular, .NET, GDAL, Leaflet, SQLite, RESTful API, WebSockets, Docker',
+    description: 'Developed a full-stack weather visualization platform for  for multi-model weather display with interactive geospatial mapping and real-time updates via WebSockets. Implemented GDAL raster processing, supported by a RESTful API and SQLite database and containerized the application with Docker to streamline development and deployment.',
     image: '/images/project4.png',
-    logos: ['/logos/angular.svg', '/logos/dotnet.svg', '/logos/gdal.svg', '/logos/leaflet.svg', '/logos/sqlite.svg', '/logos/restful-api.svg'],
+    logos: ['/logos/angular.svg', '/logos/dotnet.svg', '/logos/gdal.svg', '/logos/leaflet.svg', '/logos/sqlite.svg', '/logos/restful-api.svg', '/logos/websocket.svg', '/logos/docker.svg'],
     caption: "It's so cold,\neven the code froze.",
   },
   {
