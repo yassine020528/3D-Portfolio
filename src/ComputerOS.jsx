@@ -11,6 +11,7 @@ import FullscreenFigureModal from './features/os/FullscreenFigureModal';
 import osStyles from './features/os/osStyles';
 import Taskbar from './features/os/Taskbar';
 import AboutWindow from './features/os/windows/AboutWindow';
+import ChatbotWindow from './features/os/windows/ChatbotWindow';
 import ContactWindow from './features/os/windows/ContactWindow';
 import GamesWindow from './features/os/windows/GamesWindow';
 import MobileWindow from './features/os/windows/MobileWindow';
@@ -163,7 +164,7 @@ export default function ComputerOS({ onExit }) {
 
     switch (normalizedCommand) {
       case 'help':
-        response = 'Available: help, about, projects, contact, games, mobile, flower, vscode, recycle, clear, exit';
+        response = 'Available: help, about, projects, contact, games, mobile, flower, vscode, chatbot, recycle, clear, exit';
         break;
       case 'about':
         openWindow('about');
@@ -188,6 +189,10 @@ export default function ComputerOS({ onExit }) {
       case 'vscode':
         openWindow('vscode');
         response = 'Launching vscode.exe...';
+        break;
+      case 'chatbot':
+        openWindow('chatbot');
+        response = 'Launching chatbot.ai...';
         break;
       case 'flower':
         openWindow('flower');
@@ -392,6 +397,7 @@ export default function ComputerOS({ onExit }) {
         </Suspense>
       )}
       <RecycleWindow windowState={windows.recycle} controls={controlsFor('recycle')} />
+      <ChatbotWindow windowState={windows.chatbot} controls={controlsFor('chatbot')} />
       <TerminalWindow
         windowState={windows.terminal}
         controls={controlsFor('terminal')}

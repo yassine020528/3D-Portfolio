@@ -11,6 +11,7 @@ export const initialWindows = {
   games: { id: 'games', title: '~/games', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 240, y: 60 },
   flappyBird: { id: 'flappyBird', title: 'flappy_bird.exe', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 280, y: 100 },
   minesweeper: { id: 'minesweeper', title: 'minesweeper.exe', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 320, y: 80 },
+  chatbot: { id: 'chatbot', title: 'chatbot.ai', isOpen: false, isMaximized: false, isMinimized: false, zIndex: 100, x: 420, y: 70 },
 };
 
 export const themeVars = {
@@ -38,6 +39,7 @@ export const desktopIcons = [
   { id: 'vscode', label: 'VS Code', className: 'icon-vscode', isImageIcon: true, usesVsCodeBackground: true, imageSrc: '/images/vscode.png', imageAlt: 'VS Code' },
   { id: 'flower', label: 'Flower', icon: '🌸', className: 'icon-flower', iconStyle: { background: 'linear-gradient(135deg, #ffd0dd 0%, #e9b8ff 100%)', color: '#5c2345' } },
   { id: 'recycle', label: 'Recycle', icon: '♻', className: 'icon-recycle', iconStyle: { background: '#8ecae6', color: '#10354a' } },
+  { id: 'chatbot', label: 'Chatbot', className: 'icon-chatbot', isImageIcon: true, usesVsCodeBackground: true, imageSrc: '/images/chatbot.png', imageAlt: 'Chatbot' },
 ];
 
 export const startMenuItems = [
@@ -47,6 +49,7 @@ export const startMenuItems = [
   { id: 'mobile', label: 'Mobile' },
   { id: 'flower', label: 'Flower' },
   { id: 'vscode', label: 'VS Code' },
+  { id: 'chatbot', label: 'Chatbot' },
   { id: 'contact', label: 'Contact' },
 ];
 
@@ -167,10 +170,10 @@ export const projects = [
   {
     id: 4,
     title: 'Hydro-Quebec Weather Forecasting Platform',
-    tech: 'Angular, .NET, GDAL, Leaflet, SQLite, RESTful API, WebSockets, Docker',
-    description: 'Developed a full-stack weather visualization platform for  for multi-model weather display with interactive geospatial mapping and real-time updates via WebSockets. Implemented GDAL raster processing, supported by a RESTful API and SQLite database and containerized the application with Docker to streamline development and deployment.',
+    tech: 'Angular, .NET, GDAL, Leaflet, SQLite, RESTful API, SignalR, Docker',
+    description: 'Developed a full-stack weather visualization platform for  for multi-model weather display with interactive geospatial mapping and real-time updates via SignalR. Implemented GDAL raster processing, supported by a RESTful API and SQLite database and containerized the application with Docker to streamline development and deployment.',
     image: '/images/project4.png',
-    logos: ['/logos/angular.svg', '/logos/dotnet.svg', '/logos/gdal.svg', '/logos/leaflet.svg', '/logos/sqlite.svg', '/logos/restful-api.svg', '/logos/websocket.svg', '/logos/docker.svg'],
+    logos: ['/logos/angular.svg', '/logos/dotnet.svg', '/logos/gdal.svg', '/logos/leaflet.svg', '/logos/sqlite.svg', '/logos/restful-api.svg', '/logos/signalr.svg', '/logos/docker.svg'],
     caption: "It's so cold,\neven the code froze.",
   },
   {
@@ -185,10 +188,10 @@ export const projects = [
   {
     id: 6,
     title: 'Personal Portfolio OS',
-    tech: 'HTML5, CSS, JS, React, ThreeJS',
-    description: 'Built this portfolio as an interactive 3D room and browser-based operating system, complete with draggable windows, terminal commands, theme switching, fullscreen media, procedural flower art, and built-in games like Flappy Bird and Minesweeper.',
+    tech: 'HTML5, CSS, JS, React, ThreeJS, Gemini, Upstash Redis',
+    description: 'Built this portfolio as an interactive 3D room and browser-based operating system, complete with draggable windows, terminal commands, theme switching, fullscreen media, procedural flower art, built-in games, and a Gemini-powered custom chatbot assistant served through a server function with Upstash-backed rate limiting.',
     image: '/images/portfolio.png',
-    logos: ['/logos/html.svg', '/logos/css.svg', '/logos/javascript.svg', '/logos/react.svg', '/logos/threejs.svg'],
+    logos: ['/logos/html.svg', '/logos/css.svg', '/logos/javascript.svg', '/logos/react.svg', '/logos/threejs.svg', '/logos/upstash.svg'],
     caption: 'Feels weird,\nweirdly familiar.',
   },
 ];

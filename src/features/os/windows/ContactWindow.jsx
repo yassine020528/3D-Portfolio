@@ -30,13 +30,10 @@ export default function ContactWindow({
         {socialLinks.map((link) => (
           <a
             key={link.label}
-            href={link.external ? '#' : link.href}
+            href={link.href}
             className="social-link"
-            target={link.external ? undefined : '_top'}
-            onClick={link.external ? (event) => {
-              event.preventDefault();
-              window.open(link.href, '_blank');
-            } : undefined}
+            target={link.external ? '_blank' : '_top'}
+            rel={link.external ? 'noreferrer' : undefined}
           >
             {link.label}
           </a>
