@@ -5,10 +5,10 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const functionDir = dirname(fileURLToPath(import.meta.url));
 
 function getKnowledgeBase() {
-  return readFileSync(join(__dirname, 'chatbot-knowledge.txt'), 'utf8').trim();
+  return readFileSync(join(functionDir, 'chatbot-knowledge.txt'), 'utf8').trim();
 }
 
 const API_KEY = process.env.GEMINI_API_KEY;
