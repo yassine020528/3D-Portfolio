@@ -123,7 +123,11 @@ Core ideas used in the flower renderer:
 - Perspective scaling uses formulas like `focal / (focal + z)` so depth changes the apparent size of petals and inner flower structures.
 - Petals are generated in layers using radial placement around `2 * PI`, then shaped with width envelopes such as `sin(t * PI)` and phase-shifted ripple terms.
 - Leaves and sepals are drawn with Bezier curves for more organic silhouettes instead of relying on image assets.
-
+## Chatbot information
+- User prompts are limited to 800 characters.
+- The UI has a 3-second cooldown between messages.
+- The chatbot has a daily limit of 20 messages per session.
+- The daily limit resets at 00:00 UTC
 ### TECHNICAL SKILLS:
 Languages: C, C++, C#, Java, Kotlin, Swift, Python, JavaScript, TypeScript, VHDL, Assembly
 Web & Mobile: Angular, React.js, Node.js, NestJS, Express.js, WebSockets, SignalR, SwiftUI, Jetpack Compose, .NET, Three.js
