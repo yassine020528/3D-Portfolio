@@ -212,7 +212,7 @@ export default function ChatbotWindow({ windowState, controls }) {
         <div className="chatbot-toolbar">
           <div className="chatbot-identity">
             <div className="chatbot-avatar">
-              <img src="/images/chatbot.png" alt="" />
+              <img src="/images/assistant.png" alt="" />
             </div>
             <div>
               <div className="chatbot-title">Portfolio Assistant</div>
