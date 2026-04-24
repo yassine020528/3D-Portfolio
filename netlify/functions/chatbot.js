@@ -113,7 +113,7 @@ function getAllowedOrigins() {
 
 function isOriginAllowed(origin) {
   if (!origin) {
-    return false;
+    return true;
   }
 
   return getAllowedOrigins().has(origin);
