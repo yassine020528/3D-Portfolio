@@ -1,14 +1,28 @@
 import { GoogleGenAI } from '@google/genai';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
-const functionDir = dirname(fileURLToPath(import.meta.url));
+const knowledgeFileCandidates = [
+  join(process.cwd(), 'netlify/functions/chatbot-knowledge.txt'),
+  join(process.cwd(), 'chatbot-knowledge.txt'),
+  ...(process.env.LAMBDA_TASK_ROOT
+    ? [
+        join(process.env.LAMBDA_TASK_ROOT, 'netlify/functions/chatbot-knowledge.txt'),
+        join(process.env.LAMBDA_TASK_ROOT, 'chatbot-knowledge.txt'),
+      ]
+    : []),
+];
 
 function getKnowledgeBase() {
-  return readFileSync(join(functionDir, 'chatbot-knowledge.txt'), 'utf8').trim();
+  const knowledgeFile = knowledgeFileCandidates.find((filePath) => existsSync(filePath));
+
+  if (!knowledgeFile) {
+    throw new Error('Missing chatbot knowledge base file');
+  }
+
+  return readFileSync(knowledgeFile, 'utf8').trim();
 }
 
 const API_KEY = process.env.GEMINI_API_KEY;
