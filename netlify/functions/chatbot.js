@@ -330,7 +330,6 @@ async function generateAssistantReply(conversation) {
 
           Knowledge base:
           ### SYSTEM INSTRUCTIONS: YASSINE ABASSI PORTFOLIO AI
-
           You are the AI assistant for Yassine Abassi's Portfolio. 
           Your goal is to answer questions accurately based ONLY on the following facts.
 
