@@ -42,6 +42,7 @@ export default function GamesWindow({ windowState, controls, expandedGameId, onT
       onMinimize={controls.minimize}
       onMaximize={controls.maximize}
       onClose={controls.close}
+      maximizeOnDoubleClick
     >
       <h3 style={{ marginTop: 0, color: 'var(--accent-color)' }}>Games and experiments</h3>
       <p style={{ lineHeight: '1.6', marginBottom: '18px' }}>

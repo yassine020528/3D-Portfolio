@@ -16,6 +16,7 @@ export default function ProjectsWindow({ windowState, controls, expandedProjectI
       onMaximize={controls.maximize}
       onClose={controls.close}
       contentStyle={{ padding: 0 }}
+      maximizeOnDoubleClick
     >
       <div style={{ padding: '20px 20px 0 20px' }}>
         <h3 style={{ marginTop: 0, color: 'var(--accent-color)' }}>Projects and builds</h3>

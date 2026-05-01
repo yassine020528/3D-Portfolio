@@ -348,6 +348,7 @@ export default function MinesweeperWindow({ windowState, controls }) {
       onClose={controls.close}
       contentStyle={{ padding: 0, overflow: 'hidden', display: 'flex', justifyContent: 'center', background: '#bdbdbd' }}
       preserveOnMinimize
+      maximizeOnDoubleClick
     >
       <div className="game-canvas-shell minesweeper-canvas-shell">
         <canvas

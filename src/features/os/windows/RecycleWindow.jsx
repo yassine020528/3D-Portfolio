@@ -14,6 +14,7 @@ export default function RecycleWindow({ windowState, controls }) {
       onMaximize={controls.maximize}
       onClose={controls.close}
       contentStyle={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '16px' }}
+      maximizeOnDoubleClick
     >
       <div style={{ fontSize: '3rem', textAlign: 'center' }}>♻</div>
       <p style={{ margin: 0, textAlign: 'center', fontSize: '1rem', lineHeight: '1.7' }}>

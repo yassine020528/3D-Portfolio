@@ -205,6 +205,7 @@ export default function ChatbotWindow({ windowState, controls }) {
       onMinimize={controls.minimize}
       onMaximize={controls.maximize}
       onClose={controls.close}
+      maximizeOnDoubleClick
       contentClassName="chatbot-window-content"
       contentStyle={{ padding: 0, overflow: 'hidden' }}
     >

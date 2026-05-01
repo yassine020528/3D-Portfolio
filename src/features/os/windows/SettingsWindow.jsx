@@ -14,6 +14,7 @@ export default function SettingsWindow({ windowState, controls, theme, setTheme 
       onMinimize={controls.minimize}
       onMaximize={controls.maximize}
       onClose={controls.close}
+      maximizeOnDoubleClick
     >
       <p><strong>Theme Selection</strong></p>
       {themeOptions.map((option) => (

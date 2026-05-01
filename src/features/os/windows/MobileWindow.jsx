@@ -14,6 +14,7 @@ export default function MobileWindow({ windowState, controls, expandedMobileId, 
       onMinimize={controls.minimize}
       onMaximize={controls.maximize}
       onClose={controls.close}
+      maximizeOnDoubleClick
     >
       <h3 style={{ marginTop: 0, color: 'var(--accent-color)' }}>Mobile builds and experiments</h3>
       <p style={{ lineHeight: '1.6', marginBottom: '18px' }}>

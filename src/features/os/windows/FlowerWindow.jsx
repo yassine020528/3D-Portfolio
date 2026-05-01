@@ -18,6 +18,7 @@ export default function FlowerWindow({ windowState, controls }) {
       contentClassName="flower-window-content"
       contentStyle={{ padding: 0, overflow: 'hidden', background: '#000000' }}
       preserveOnMinimize
+      maximizeOnDoubleClick
     >
       <FlowerExperience isActive={!windowState.isMinimized} />
     </WindowFrame>

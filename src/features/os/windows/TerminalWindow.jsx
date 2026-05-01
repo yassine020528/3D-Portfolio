@@ -25,6 +25,7 @@ export default function TerminalWindow({
       titleStyle={{ color: '#fff' }}
       contentStyle={{ padding: '10px', background: '#000', color: '#0f0', fontFamily: 'monospace' }}
       frameStyle={{ background: '#000', borderColor: '#333' }}
+      maximizeOnDoubleClick
     >
       {termHistory.map((line, index) => <div key={`${line}-${index}`}>{line}</div>)}
       <div ref={termEndRef} />

@@ -319,6 +319,7 @@ export default function FlappyBirdWindow({ windowState, controls }) {
       frameStyle={windowState.isMaximized ? undefined : { height: 'auto' }}
       contentStyle={{ padding: 0, overflow: 'hidden', display: 'flex', background: '#000' }}
       preserveOnMinimize
+      maximizeOnDoubleClick
     >
       <div className="game-canvas-shell flappy-canvas-shell">
         <canvas
