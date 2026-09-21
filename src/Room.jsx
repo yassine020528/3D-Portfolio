@@ -9,9 +9,10 @@ Title: Low Poly BedRoom
 
 import React from 'react';
 import { useGLTF } from '@react-three/drei';
+import ResumeSheet from './components/ResumeSheet';
 
 export default function Room(props) {
-  const { onScreenClick, ...groupProps } = props;
+  const { onScreenClick, onResumeClick, ...groupProps } = props;
   const { nodes, materials } = useGLTF('/glb/room.glb');
   const handlePointerOver = () => document.body.style.cursor = 'pointer';
   const handlePointerOut = () => document.body.style.cursor = 'auto';
@@ -20,6 +21,7 @@ export default function Room(props) {
     <group {...groupProps} dispose={null}>
       <group rotation={[-Math.PI / 2, 0, 0]} scale={1.147}>
         <group rotation={[Math.PI / 2, 0, 0]} scale={0.01}>
+          <ResumeSheet onClick={onResumeClick} />
           <mesh geometry={nodes.Cube_Material_0.geometry} material={materials.Material} rotation={[-Math.PI / 2, 0, 0]} scale={[200, 500, 200]} />
           <mesh geometry={nodes.Cube001_Material017_0.geometry} material={materials['Material.017']} position={[-186.548, 66.479, 53.676]} rotation={[-Math.PI / 2, 0, 0]} scale={[2.82, 27.101, 57.812]} />
           <mesh geometry={nodes.Sphere_Material016_0.geometry} material={materials['Material.016']} position={[-182.724, 65.012, 29.885]} rotation={[-Math.PI / 2, 0, 0]} scale={2.337} />

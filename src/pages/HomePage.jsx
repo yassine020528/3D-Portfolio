@@ -11,6 +11,7 @@ import Yassine from '../Yassine';
 import LoadingScreen from '../components/shared/LoadingScreen';
 import OccludedHtml from '../components/shared/OccludedHtml';
 import StatusOverlay from '../components/shared/StatusOverlay';
+import ResumeViewer from '../components/ResumeViewer';
 import { playClickSound, playCatSound, playPowerToggleSound } from '../lib/sound';
 
 const ROOM_CAMERA_POSITION = [60, 80, -60];
@@ -127,7 +128,7 @@ function DynamicBackground() {
   return null;
 }
 
-function RoomModel({ onCatClick, onAvatarClick, onComputerClick }) {
+function RoomModel({ onCatClick, onAvatarClick, onComputerClick, onResumeClick }) {
   const roomRef = useRef(null);
 
   useEffect(() => {
@@ -161,7 +162,7 @@ function RoomModel({ onCatClick, onAvatarClick, onComputerClick }) {
 
   return (
     <group ref={roomRef}>
-      <Room scale={45} position={[-20, 0, 40]} rotation={[0, Math.PI / 2, 0]} onScreenClick={onComputerClick} />
+      <Room scale={45} position={[-20, 0, 40]} rotation={[0, Math.PI / 2, 0]} onScreenClick={onComputerClick} onResumeClick={onResumeClick} />
       <group scale={4} position={[-30, 5.1, 100]} rotation={[0, Math.PI / 2 + Math.PI / 6, 0]}>
         <Cat
           onClick={(event) => {
@@ -387,7 +388,8 @@ export default function HomePage() {
       {!started && <LoadingScreen onStarted={() => setStarted(true)} />}
 
       <Bio visible={showBio} onClose={() => setShowBio(false)} />
-      <StatusOverlay visible={started} />
+      <StatusOverlay visible={started && view === 'room'} />
+      {view === 'resume' && <ResumeViewer onClose={() => setView('room')} />}
       {view === 'room' && (
         <ControlBanner
           items={controlBannerItems}
@@ -448,6 +450,11 @@ export default function HomePage() {
 
         <Suspense fallback={null}>
           <RoomModel
+            onResumeClick={() => {
+              playClickSound();
+              setShowBio(false);
+              setView('resume');
+            }}
             onCatClick={() => {
               playCatSound();
               setIsCatBannerVisible(true);
@@ -472,6 +479,9 @@ export default function HomePage() {
           />
           {started && view === 'room' && !showBio && (
             <>
+              <OccludedHtml position={[-32.9, 39, 114.84]} center distanceFactor={80}>
+                <PromptTag text="CLICK ON THE RESUME" />
+              </OccludedHtml>
               <OccludedHtml position={[-90, 75, 60]} center distanceFactor={80}>
                 <PromptTag text="CLICK ON MY AVATAR" />
               </OccludedHtml>
