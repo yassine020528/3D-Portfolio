@@ -13,9 +13,10 @@ import { Color } from 'three';
 import ResumeSheet from './components/ResumeSheet';
 import AcAirflow from './components/AcAirflow';
 import Lamp from './components/Lamp';
+import DeskChair from './components/DeskChair';
 
 export default function Room(props) {
-  const { onScreenClick, onResumeClick, onAcClick, isAcOn, onLampClick, isLampOn, ...groupProps } = props;
+  const { onScreenClick, onResumeClick, onAcClick, isAcOn, onLampClick, isLampOn, onChairClick, isChairTurned, ...groupProps } = props;
   const { nodes, materials } = useGLTF('/glb/room.glb');
   const [isAcHovered, setIsAcHovered] = useState(false);
   const acHighlightMaterial = useMemo(() => {
@@ -95,9 +96,7 @@ export default function Room(props) {
           <mesh geometry={nodes.Cube026_Material023_0.geometry} material={materials['Material.023']} position={[-93.498, 136.851, -156.683]} rotation={[-Math.PI / 2, Math.PI / 2, 0]} scale={[2.425, 9.766, 9.766]} />
           <mesh geometry={nodes.Cylinder_Material019_0.geometry} material={materials['Material.019']} position={[-66.319, 129.448, -154.161]} rotation={[-Math.PI / 2, 0, 0]} scale={5.739} />
           <mesh geometry={nodes.Icosphere_Material020_0.geometry} material={materials['Material.020']} position={[-65.831, 130.041, -156.284]} rotation={[-1.834, 0.423, -0.349]} scale={0.591} />
-          <mesh geometry={nodes.Cube027_Material044_0.geometry} material={materials['Material.044']} position={[-107.432, 36.706, -77.177]} rotation={[-Math.PI / 2, 0, 0]} scale={[18.608, 19.096, 1.655]} />
-          <mesh geometry={nodes.Cylinder001_Material025_0.geometry} material={materials['Material.025']} position={[-107.444, 33.388, -77.384]} rotation={[-Math.PI / 2, 0, 0]} scale={[9.638, 9.638, 1.74]} />
-          <mesh geometry={nodes.Cube028_Material044_0.geometry} material={materials['Material.044']} position={[-90.385, 61.879, -77.177]} rotation={[0, Math.PI / 2, 0]} scale={[18.608, 23.729, 1.655]} />
+          <DeskChair nodes={nodes} materials={materials} turned={isChairTurned} onClick={onChairClick} />
           <mesh geometry={nodes.Sphere002_Material026_0.geometry} material={materials['Material.026']} position={[122.398, 37.019, 122.064]} rotation={[-Math.PI / 2, 0, 0]} scale={35.853} />
           <mesh geometry={nodes.Cylinder002_Material015_0.geometry} material={materials['Material.015']} position={[-172.286, 20.975, 6.082]} rotation={[-Math.PI / 2, 0, 0]} scale={13.202} />
           <mesh geometry={nodes.Cube029_Material008_0.geometry} material={materials['Material.008']} position={[-139.029, 58.355, -72.257]} rotation={[-Math.PI / 2, 0, 0]} scale={[9.881, 25.314, 0.722]} />
