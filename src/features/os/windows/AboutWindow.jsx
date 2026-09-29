@@ -20,6 +20,7 @@ export default function AboutWindow({ windowState, controls, onOpenFigure }) {
     >
       <h2 style={{ color: 'var(--accent-color)', marginTop: 0 }}>Hello, I'm Yassine</h2>
       <p><strong>Comp. Eng. Graduate</strong>, from Polytechnique Montréal</p>
+      <p><strong>Data Eng. Master's</strong> student at Polytechnique Montréal</p>
       <hr style={{ borderColor: 'var(--border-color)' }} />
       <p>
         I've been fascinated by how things work "under the hood" ever since I dismantled my first remote control car as a child.

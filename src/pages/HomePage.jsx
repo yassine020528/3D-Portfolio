@@ -128,7 +128,7 @@ function DynamicBackground() {
   return null;
 }
 
-function RoomModel({ onCatClick, onAvatarClick, onComputerClick, onResumeClick, onAcClick, isAcOn }) {
+function RoomModel({ onCatClick, onAvatarClick, onComputerClick, onResumeClick, onAcClick, isAcOn, onLampClick, isLampOn }) {
   const roomRef = useRef(null);
 
   useEffect(() => {
@@ -162,7 +162,7 @@ function RoomModel({ onCatClick, onAvatarClick, onComputerClick, onResumeClick, 
 
   return (
     <group ref={roomRef}>
-      <Room scale={45} position={[-20, 0, 40]} rotation={[0, Math.PI / 2, 0]} onScreenClick={onComputerClick} onResumeClick={onResumeClick} onAcClick={onAcClick} isAcOn={isAcOn} />
+      <Room scale={45} position={[-20, 0, 40]} rotation={[0, Math.PI / 2, 0]} onScreenClick={onComputerClick} onResumeClick={onResumeClick} onAcClick={onAcClick} isAcOn={isAcOn} onLampClick={onLampClick} isLampOn={isLampOn} />
       <group scale={4} position={[-30, 5.1, 100]} rotation={[0, Math.PI / 2 + Math.PI / 6, 0]}>
         <Cat
           onClick={(event) => {
@@ -325,6 +325,7 @@ export default function HomePage() {
   const [canvasFrameloop, setCanvasFrameloop] = useState('always');
   const [showBio, setShowBio] = useState(false);
   const [isAcOn, setIsAcOn] = useState(false);
+  const [isLampOn, setIsLampOn] = useState(false);
   const [bannerText, setBannerText] = useState('');
   const [showRotationHint, setShowRotationHint] = useState(false);
   const controlsRef = useRef(null);
@@ -465,6 +466,13 @@ export default function HomePage() {
 
         <Suspense fallback={null}>
           <RoomModel
+            isLampOn={isLampOn}
+            onLampClick={() => {
+              if (!started || view !== 'room') return;
+              playClickSound();
+              setIsLampOn((previous) => !previous);
+              showInteractionBanner(isLampOn ? 'LAMP OFF' : 'LAMP ON');
+            }}
             isAcOn={isAcOn}
             onAcClick={() => {
               if (!started || view !== 'room') return;

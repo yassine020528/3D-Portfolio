@@ -12,9 +12,10 @@ import { useGLTF } from '@react-three/drei';
 import { Color } from 'three';
 import ResumeSheet from './components/ResumeSheet';
 import AcAirflow from './components/AcAirflow';
+import Lamp from './components/Lamp';
 
 export default function Room(props) {
-  const { onScreenClick, onResumeClick, onAcClick, isAcOn, ...groupProps } = props;
+  const { onScreenClick, onResumeClick, onAcClick, isAcOn, onLampClick, isLampOn, ...groupProps } = props;
   const { nodes, materials } = useGLTF('/glb/room.glb');
   const [isAcHovered, setIsAcHovered] = useState(false);
   const acHighlightMaterial = useMemo(() => {
@@ -101,8 +102,7 @@ export default function Room(props) {
           <mesh geometry={nodes.Cylinder002_Material015_0.geometry} material={materials['Material.015']} position={[-172.286, 20.975, 6.082]} rotation={[-Math.PI / 2, 0, 0]} scale={13.202} />
           <mesh geometry={nodes.Cube029_Material008_0.geometry} material={materials['Material.008']} position={[-139.029, 58.355, -72.257]} rotation={[-Math.PI / 2, 0, 0]} scale={[9.881, 25.314, 0.722]} />
           <mesh geometry={nodes.Cube030_Material014_0.geometry} material={materials['Material.014']} position={[-137.976, 59.234, -108.636]} rotation={[-Math.PI / 2, 0, 0.261]} scale={[4.944, 3.24, 1.212]} />
-          <mesh geometry={nodes.Cylinder003_Material027_0.geometry} material={materials['Material.027']} position={[167.724, 53.006, -149.46]} rotation={[-Math.PI / 2, 0, 0]} scale={7.715} />
-          <mesh geometry={nodes.Cylinder004_Material028_0.geometry} material={materials['Material.028']} position={[167.925, 64.412, -149.386]} rotation={[-Math.PI / 2, 0, 0]} scale={5.539} />
+          <Lamp nodes={nodes} materials={materials} isOn={isLampOn} onClick={onLampClick} />
           <mesh geometry={nodes.Cube031__0.geometry} material={materials['Cube.004__0']} position={[-185.504, 13.977, 130.019]} rotation={[-Math.PI / 2, 0, 0]} scale={[1.659, 49.178, 6.265]} />
           <mesh geometry={nodes.Cube032__0.geometry} material={materials['Cube.004__0']} position={[-185.504, 13.977, -70.195]} rotation={[-Math.PI / 2, 0, 0]} scale={[1.659, 96.279, 6.265]} />
           <mesh geometry={nodes.Cube033__0.geometry} material={materials['Cube.004__0']} position={[8.121, 13.977, -166.206]} rotation={[-Math.PI / 2, 0, Math.PI / 2]} scale={[1.659, 191.6, 6.265]} />
