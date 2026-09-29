@@ -1,3 +1,5 @@
+import { createSeamlessLoop } from './seamlessAudio';
+
 const bufferCache = new Map();
 let audioContext = null;
 let unlockListenersAttached = false;
@@ -141,6 +143,10 @@ export const playSoundEffect = (sound) => {
 const clickAudio = registerSoundEffect('/sounds/click.mp3');
 const powerAudio = registerSoundEffect('/sounds/on-off-sound.mp3', 0.5);
 const catAudio = registerSoundEffect('/sounds/cat-meow.mp3', 0.2);
+const acAudio = registerSoundEffect('/sounds/ac-sound.mp3', 0.5);
+const acLoopBufferPromise = acAudio.bufferPromise?.then((buffer) => (
+  buffer ? createSeamlessLoop(getAudioContext(), buffer) : null
+)).catch(() => null);
 const keyboardAudios = [
   '/sounds/keyboard/key_1.mp3',
   '/sounds/keyboard/key_2.mp3',
@@ -153,6 +159,61 @@ const keyboardAudios = [
 export const playClickSound = () => playSoundEffect(clickAudio);
 export const playCatSound = () => playSoundEffect(catAudio);
 export const playPowerToggleSound = () => playSoundEffect(powerAudio);
+export const playAcSound = () => {
+  setPlaybackAudioSession();
+  const context = getAudioContext();
+  let stopped = false;
+  let source = null;
+  let gainNode = null;
+  let fallbackAudio = null;
+
+  const startFallback = () => {
+    if (stopped) return;
+    fallbackAudio = preloadFallbackAudio(acAudio.src, acAudio.volume);
+    fallbackAudio.loop = true;
+    fallbackAudio.play().catch(() => {});
+  };
+
+  if (context?.state === 'suspended') {
+    context.resume().catch(() => {});
+  }
+
+  if (context && acLoopBufferPromise) {
+    acLoopBufferPromise.then((buffer) => {
+      if (stopped) return;
+      if (!buffer) {
+        startFallback();
+        return;
+      }
+
+      source = context.createBufferSource();
+      gainNode = context.createGain();
+      source.buffer = buffer;
+      source.loop = true;
+      gainNode.gain.value = acAudio.volume;
+      source.connect(gainNode);
+      gainNode.connect(context.destination);
+      source.start();
+    });
+  } else {
+    startFallback();
+  }
+
+  return () => {
+    if (stopped) return;
+    stopped = true;
+    if (source) {
+      source.stop();
+      source.disconnect();
+      gainNode.disconnect();
+    }
+    if (fallbackAudio) {
+      fallbackAudio.pause();
+      fallbackAudio.currentTime = 0;
+    }
+  };
+};
+
 export const playKeyboardSound = () => {
   playSoundEffect(keyboardAudios[Math.floor(Math.random() * keyboardAudios.length)]);
 };

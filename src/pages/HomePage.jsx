@@ -12,7 +12,7 @@ import LoadingScreen from '../components/shared/LoadingScreen';
 import OccludedHtml from '../components/shared/OccludedHtml';
 import StatusOverlay from '../components/shared/StatusOverlay';
 import ResumeViewer from '../components/ResumeViewer';
-import { playClickSound, playCatSound, playPowerToggleSound } from '../lib/sound';
+import { playClickSound, playCatSound, playPowerToggleSound, playAcSound } from '../lib/sound';
 
 const ROOM_CAMERA_POSITION = [60, 80, -60];
 
@@ -26,7 +26,7 @@ const FLOOR_SURFACE_NAME = 'Cube005_Material003_0';
 const FLOOR_BASE_NAME = 'Cube006_Material013_0';
 const FLOOR_SURFACE_LIFT = 0.12;
 const HIDDEN_MESH_NAMES = new Set(['Plane001_Material042_0']);
-const CAT_BANNER_DURATION_MS = 2000;
+const INTERACTION_BANNER_DURATION_MS = 2000;
 const ROTATION_HINT_DURATION_MS = 5000;
 const MOBILE_BREAKPOINT = 830;
 const CONTROL_BANNER_TOP = '20px';
@@ -128,7 +128,7 @@ function DynamicBackground() {
   return null;
 }
 
-function RoomModel({ onCatClick, onAvatarClick, onComputerClick, onResumeClick }) {
+function RoomModel({ onCatClick, onAvatarClick, onComputerClick, onResumeClick, onAcClick, isAcOn }) {
   const roomRef = useRef(null);
 
   useEffect(() => {
@@ -143,8 +143,8 @@ function RoomModel({ onCatClick, onAvatarClick, onComputerClick, onResumeClick }
           return;
         }
 
-        child.castShadow = true;
-        child.receiveShadow = true;
+        child.castShadow = !child.userData.disableShadows;
+        child.receiveShadow = !child.userData.disableShadows;
 
         if (child.name === FLOOR_SURFACE_NAME) {
           child.position.y += FLOOR_SURFACE_LIFT;
@@ -162,7 +162,7 @@ function RoomModel({ onCatClick, onAvatarClick, onComputerClick, onResumeClick }
 
   return (
     <group ref={roomRef}>
-      <Room scale={45} position={[-20, 0, 40]} rotation={[0, Math.PI / 2, 0]} onScreenClick={onComputerClick} onResumeClick={onResumeClick} />
+      <Room scale={45} position={[-20, 0, 40]} rotation={[0, Math.PI / 2, 0]} onScreenClick={onComputerClick} onResumeClick={onResumeClick} onAcClick={onAcClick} isAcOn={isAcOn} />
       <group scale={4} position={[-30, 5.1, 100]} rotation={[0, Math.PI / 2 + Math.PI / 6, 0]}>
         <Cat
           onClick={(event) => {
@@ -287,9 +287,11 @@ function ControlBanner({ items, visible, isMobile }) {
   );
 }
 
-function CatBanner({ visible, isMobile, text }) {
+function InteractionBanner({ visible, isMobile, text }) {
   return (
     <div
+      role="status"
+      aria-live="polite"
       style={{
         position: 'absolute',
         top: isMobile ? '50%' : CAT_BANNER_TOP,
@@ -311,7 +313,7 @@ function CatBanner({ visible, isMobile, text }) {
         transition: 'opacity 320ms ease',
       }}
     >
-      {text}
+      {visible ? text : ''}
     </div>
   );
 }
@@ -322,14 +324,19 @@ export default function HomePage() {
   const [isReturning, setIsReturning] = useState(false);
   const [canvasFrameloop, setCanvasFrameloop] = useState('always');
   const [showBio, setShowBio] = useState(false);
-  const [isCatBannerVisible, setIsCatBannerVisible] = useState(false);
+  const [isAcOn, setIsAcOn] = useState(false);
+  const [bannerText, setBannerText] = useState('');
   const [showRotationHint, setShowRotationHint] = useState(false);
   const controlsRef = useRef(null);
   const previousViewRef = useRef('room');
-  const catBannerTimerRef = useRef(null);
+  const bannerTimerRef = useRef(null);
   const rotationHintTimerRef = useRef(null);
   const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
   const initialCameraPosition = isMobile ? MOBILE_ROOM_CAMERA_POSITION : ROOM_CAMERA_POSITION;
+  useEffect(() => {
+    if (isAcOn) return playAcSound();
+  }, [isAcOn]);
+
   const controlBannerItems = isMobile
     ? [
       { icon: CONTROL_ICON_PATHS.drag, text: 'Tap and drag to look around' },
@@ -374,14 +381,22 @@ export default function HomePage() {
   }, [started]);
 
   useEffect(() => () => {
-    if (catBannerTimerRef.current) {
-      window.clearTimeout(catBannerTimerRef.current);
+    if (bannerTimerRef.current) {
+      window.clearTimeout(bannerTimerRef.current);
     }
 
     if (rotationHintTimerRef.current) {
       window.clearTimeout(rotationHintTimerRef.current);
     }
   }, []);
+
+  const showInteractionBanner = (text) => {
+    setBannerText(text);
+    window.clearTimeout(bannerTimerRef.current);
+    bannerTimerRef.current = window.setTimeout(() => {
+      setBannerText('');
+    }, INTERACTION_BANNER_DURATION_MS);
+  };
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
@@ -398,9 +413,9 @@ export default function HomePage() {
         />
       )}
       {view === 'room' && (
-        <CatBanner
-          text="Stop disturbing the cat"
-          visible={isCatBannerVisible}
+        <InteractionBanner
+          text={bannerText}
+          visible={Boolean(bannerText)}
           isMobile={isMobile}
         />
       )}
@@ -450,6 +465,13 @@ export default function HomePage() {
 
         <Suspense fallback={null}>
           <RoomModel
+            isAcOn={isAcOn}
+            onAcClick={() => {
+              if (!started || view !== 'room') return;
+              playClickSound();
+              setIsAcOn((previous) => !previous);
+              showInteractionBanner(isAcOn ? 'AC OFF' : 'AC ON');
+            }}
             onResumeClick={() => {
               playClickSound();
               setShowBio(false);
@@ -457,15 +479,7 @@ export default function HomePage() {
             }}
             onCatClick={() => {
               playCatSound();
-              setIsCatBannerVisible(true);
-
-              if (catBannerTimerRef.current) {
-                window.clearTimeout(catBannerTimerRef.current);
-              }
-
-              catBannerTimerRef.current = window.setTimeout(() => {
-                setIsCatBannerVisible(false);
-              }, CAT_BANNER_DURATION_MS);
+              showInteractionBanner('Stop disturbing the cat');
             }}
             onAvatarClick={() => {
               playClickSound();

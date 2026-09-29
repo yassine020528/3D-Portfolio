@@ -7,13 +7,25 @@ Source: https://sketchfab.com/3d-models/low-poly-bedroom-e93c07bc43cc41fababa8ca
 Title: Low Poly BedRoom
 */
 
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
+import { Color } from 'three';
 import ResumeSheet from './components/ResumeSheet';
+import AcAirflow from './components/AcAirflow';
 
 export default function Room(props) {
-  const { onScreenClick, onResumeClick, ...groupProps } = props;
+  const { onScreenClick, onResumeClick, onAcClick, isAcOn, ...groupProps } = props;
   const { nodes, materials } = useGLTF('/glb/room.glb');
+  const [isAcHovered, setIsAcHovered] = useState(false);
+  const acHighlightMaterial = useMemo(() => {
+    const material = materials['Material.001'].clone();
+    material.color.lerp(new Color('#79d9ff'), 0.45);
+    material.emissive.set('#79d9ff');
+    material.emissiveIntensity = 0.35;
+    return material;
+  }, [materials]);
+
+  useEffect(() => () => acHighlightMaterial.dispose(), [acHighlightMaterial]);
   const handlePointerOver = () => document.body.style.cursor = 'pointer';
   const handlePointerOut = () => document.body.style.cursor = 'auto';
 
@@ -25,7 +37,22 @@ export default function Room(props) {
           <mesh geometry={nodes.Cube_Material_0.geometry} material={materials.Material} rotation={[-Math.PI / 2, 0, 0]} scale={[200, 500, 200]} />
           <mesh geometry={nodes.Cube001_Material017_0.geometry} material={materials['Material.017']} position={[-186.548, 66.479, 53.676]} rotation={[-Math.PI / 2, 0, 0]} scale={[2.82, 27.101, 57.812]} />
           <mesh geometry={nodes.Sphere_Material016_0.geometry} material={materials['Material.016']} position={[-182.724, 65.012, 29.885]} rotation={[-Math.PI / 2, 0, 0]} scale={2.337} />
-          <mesh geometry={nodes.Cube002_Material001_0.geometry} material={materials['Material.001']} position={[85.603, 157.079, -161.953]} rotation={[-Math.PI / 2, 0, 0]} scale={[48.513, 11.904, 14.731]} />
+          <mesh geometry={nodes.Cube002_Material001_0.geometry} material={isAcHovered ? acHighlightMaterial : materials['Material.001']} position={[85.603, 157.079, -161.953]} rotation={[-Math.PI / 2, 0, 0]} scale={[48.513, 11.904, 14.731]}
+            onClick={(event) => {
+              event.stopPropagation();
+              onAcClick?.();
+            }}
+            onPointerOver={(event) => {
+              event.stopPropagation();
+              setIsAcHovered(true);
+              handlePointerOver();
+            }}
+            onPointerOut={() => {
+              setIsAcHovered(false);
+              handlePointerOut();
+            }}
+          />
+          <AcAirflow active={isAcOn} />
           <mesh geometry={nodes.Cube003_Material012_0.geometry} material={materials['Material.012']} position={[78.787, 25.838, -71.783]} rotation={[-Math.PI / 2, 0, 0]} scale={[63.494, 90.594, 7.459]} />
           <mesh geometry={nodes.Cube004__0.geometry} material={materials['Cube.004__0']} position={[79.084, 35.333, -73.599]} rotation={[-Math.PI / 2, 0, 0]} scale={[59.992, 89.019, 2.127]} />
           <mesh geometry={nodes.Cube005_Material003_0.geometry} material={materials['Material.003']} position={[0.954, 0, -91.695]} rotation={[-Math.PI / 2, 0, 0]} scale={100} />
